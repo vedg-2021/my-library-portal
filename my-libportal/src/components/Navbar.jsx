@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom'; // Assuming you're using React Router f
 
 function NavBar() {
   return (
-    <AppBar position="sticky">
+    <AppBar position="sticky" sx={{backgroundColor: '#6404eb' }}>
       <Toolbar>
-        <Container sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+        <Container sx={{ display: 'flex', justifyContent: 'space-between', width: '100%'}}>
           {/* Logo or Title */}
           <Typography variant="h6">
             Library Portal

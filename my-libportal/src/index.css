@@ -11,3 +11,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* I've changed color of all buttons to #6404eb */
+.MuiButton-contained {
+  background-color: #6404eb !important;
+  color: #fff;                
+  border-radius: 4px;         
+}
+
+/* Change background color on hover */
+.MuiButton-contained:hover {
+  background-color: #3b008e !important;
+}
+
