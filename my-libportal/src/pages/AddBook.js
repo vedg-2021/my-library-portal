@@ -1,21 +1,34 @@
-import React, { useState } from 'react';
-import { TextField, Button, Container, Box, Typography, MenuItem, Select, InputLabel, FormControl, FormHelperText } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { TextField, Button, Container, Box, Typography, MenuItem, Select, InputLabel, FormControl, FormHelperText, Alert } from '@mui/material';
+import axios from 'axios';
 
 function AddBook() {
   // State to manage form inputs
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
-  const [publicationDate, setPublicationDate] = useState('');
+  const [publication_date, setPublicationDate] = useState('');
   const [genre, setGenre] = useState('');
-  const [availability, setAvailability] = useState('');
+  const [availability_status, setAvailability] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [open, setOpen] = useState(true);
+
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setOpen(false);
+      }, 5000); // Success dissapears after 5 seconds
+
+      return () => clearTimeout(timer); // Cleanup on unmount
+    }
+  }, [success]);
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Simple validation
-    if (!title || !author || !publicationDate || !genre || !availability) {
+    if (!title || !author || !publication_date || !genre || !availability_status) {
       setError('All fields are required.');
       return;
     }
@@ -26,20 +39,29 @@ function AddBook() {
     const newBook = {
       title,
       author,
-      publicationDate,
+      publication_date,
       genre,
-      availability,
+      availability_status,
     };
 
     // You can log the book details or send them to your backend here
+    setSuccess('New Book Added!');
+    setOpen(true);
     console.log('New Book Added:', newBook);
+    try {
+        const response = await axios.post('http://localhost:3000/add_book', {book:newBook});
+        setSuccess(response.data.message);
+        // Reset form fields
+        setTitle('');
+        setAuthor('');
+        setPublicationDate('');
+        setGenre('');
+        setAvailability('');
+    } catch (error) {
+        console.error(error);
+        setError(error.response.data.errors.join(', '));
+    }
 
-    // Reset form fields
-    setTitle('');
-    setAuthor('');
-    setPublicationDate('');
-    setGenre('');
-    setAvailability('');
   };
 
   return (
@@ -65,6 +87,12 @@ function AddBook() {
           <Typography variant="body2" color="error" sx={{ width: '100%', mb: 2 }}>
             {error}
           </Typography>
+        )}
+
+        {open && success && (
+            <Alert severity="success" sx={{ width: '100%', mb: 2 }}>
+                {success}
+            </Alert>
         )}
 
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
@@ -98,7 +126,7 @@ function AddBook() {
             required
             margin="normal"
             type="date"
-            value={publicationDate}
+            value={publication_date}
             onChange={(e) => setPublicationDate(e.target.value)}
             InputLabelProps={{
               shrink: true,
@@ -128,13 +156,12 @@ function AddBook() {
           <FormControl fullWidth required margin="normal">
             <InputLabel>Availability</InputLabel>
             <Select
-              value={availability}
+              value={availability_status}
               onChange={(e) => setAvailability(e.target.value)}
               label="Availability"
             >
-              <MenuItem value="Available">Available</MenuItem>
-              <MenuItem value="Checked Out">Checked Out</MenuItem>
-              <MenuItem value="Reserved">Reserved</MenuItem>
+              <MenuItem value="true">Available</MenuItem>
+              <MenuItem value="false">Borrowed</MenuItem>
             </Select>
             <FormHelperText>Choose availability status</FormHelperText>
           </FormControl>
