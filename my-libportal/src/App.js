@@ -9,7 +9,6 @@ import AboutUs from './pages/AboutUs';
 import Librarian from './pages/Librarian';
 import AddBook from './pages/AddBook';
 import UsersTable from './pages/UsersTable';
-import SignUpForm from './pages/SignUpForm';
 
 function App() {
   return (
