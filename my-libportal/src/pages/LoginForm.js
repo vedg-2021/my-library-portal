@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Container, Box, Typography, Grid, Alert } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function LoginForm({ userType = "user", loginUrl = "/login", dashboardUrl = "/user-dashboard" }) {
   // State for form fields
@@ -112,13 +112,17 @@ function LoginForm({ userType = "user", loginUrl = "/login", dashboardUrl = "/us
           <Grid container justifyContent="flex-end">
             <Grid item>
               {userType === "librarian" ? (
-                <Button color="inherit" href={loginUrl}>
+                <Link to="/login" style={{ color: 'inherit'}}>
+                <Button color="inherit">
                   Regular User? Log In Here
                 </Button>
+                </Link>
               ) : (
+                <Link to="/signup" style={{ color: 'inherit'}}>
                 <Button color="inherit" href="/signup">
                   Don't have an account? Sign Up
                 </Button>
+                </Link>
               )}
             </Grid>
           </Grid>

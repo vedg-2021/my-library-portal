@@ -3,7 +3,7 @@ import { TextField, Button, Container, Box, Typography, Grid, Alert } from '@mui
 import { Link } from 'react-router-dom';  // Import Link from react-router-dom
 import axios from 'axios';
 
-function SignUp({ userType="user" }) {
+function SignUpForm({ userType="user" }) {
     // State for form fields
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -47,8 +47,8 @@ function SignUp({ userType="user" }) {
 
         // Make API call to Rails backend
         try {
-            const response = await axios.post(userType === "user" ? 'http://localhost:3000/signup' : 'http://localhost:3000/add_librarian', {
-                [userType==="user" ? "user" : "librarian"]: {
+            const response = await axios.post(userType === "user" ? 'http://localhost:3000/signup' : 'http://localhost:3000/librarian_signup', {
+                user: {
                     name,
                     email,
                     phone,
@@ -60,12 +60,7 @@ function SignUp({ userType="user" }) {
 
             // If user creation is successful, display success message
             setSuccess(response.data.message);
-            if(userType==='user'){
-                console.log('User Info:', response.data.user);
-            } else{
-                console.log('Librarian Info:', response.data.librarian);
-            }
-
+            console.log('User Info:', response.data.user);
             setName('');
             setEmail('');
             setPhone('');
@@ -209,4 +204,4 @@ function SignUp({ userType="user" }) {
     );
 }
 
-export default SignUp;
+export default SignUpForm;

@@ -10,4 +10,7 @@ Rails.application.routes.draw do
   # Define the signup route
   post '/signup', to: 'users#create' # When a post request is made to /signup we send it to users controller create method
   get 'users', to: 'users#index'  # New route to fetch all users
+  post '/add_librarian', to: 'librarians#create' 
+  post '/add_book', to: 'books#create'
+  post '/borrow_book', to: 'borrows#borrow'
 end

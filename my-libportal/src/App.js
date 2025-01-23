@@ -9,6 +9,7 @@ import AboutUs from './pages/AboutUs';
 import Librarian from './pages/Librarian';
 import AddBook from './pages/AddBook';
 import UsersTable from './pages/UsersTable';
+import SignUpForm from './pages/SignUpForm';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route exact path="/librarian" element={<Librarian />} />
         <Route exact path="/addbook" element={<AddBook />} />
         <Route exact path="/users" element={<UsersTable />} />
+        <Route exact path="/add_librarian" element={<SignUp userType="librarian" />} />
       </Routes>
     </Router>
       {/* <h1>Hello World</h1> */}

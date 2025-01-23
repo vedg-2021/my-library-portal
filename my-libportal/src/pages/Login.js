@@ -6,8 +6,8 @@ function Login() {
     <div>
       <LoginForm 
         userType="user" 
-        loginUrl="/login" 
-        dashboardUrl="/user-dashboard" 
+        // loginUrl="/login" 
+        // dashboardUrl="/user-dashboard" 
       />
     </div>
   );

@@ -48,6 +48,8 @@ function UsersTable() {
               <TableRow>
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
+                <TableCell>Phone</TableCell>
+                <TableCell>Address</TableCell>
                 <TableCell>Created At</TableCell>
               </TableRow>
             </TableHead>
@@ -56,6 +58,8 @@ function UsersTable() {
                 <TableRow key={user.id}>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.phone}</TableCell>
+                  <TableCell>{user.address}</TableCell>
                   <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
                 </TableRow>
               ))}
