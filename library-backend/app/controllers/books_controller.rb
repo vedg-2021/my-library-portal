@@ -1,4 +1,8 @@
 class BooksController < ApplicationController
+    def index
+        @books = Book.all
+        render json: @books
+    end
     def create
         @book = Book.new(book_params)
         if @book.save

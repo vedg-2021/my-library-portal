@@ -9,6 +9,7 @@ import AboutUs from './pages/AboutUs';
 import Librarian from './pages/Librarian';
 import AddBook from './pages/AddBook';
 import UsersTable from './pages/UsersTable';
+import AllBooks from './pages/AllBooks';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <NavBar />
       <Routes>
         {/* Define routes for your pages */}
+        <Route exact path="/" element={<AllBooks />} />
         <Route exact path="/signup" element={<SignUp />} />
         <Route exact path="/login" element={<Login />} />
         <Route exact path="/about" element={<AboutUs />} />

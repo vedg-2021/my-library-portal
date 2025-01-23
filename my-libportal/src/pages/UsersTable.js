@@ -13,7 +13,8 @@ function UsersTable() {
     const fetchUsers = async () => {
       try {
         const response = await axios.get('http://localhost:3000/users');
-        setUsers(response.data);  // Save users data to state
+        setUsers(response.data);  // Save users data to users state we defined above
+        console.log(response.data);
         setLoading(false);         // Stop loading
       } catch (error) {
         setError('Error fetching users');
