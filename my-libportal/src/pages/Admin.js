@@ -6,9 +6,6 @@ function Admin() {
     <div>
       <LoginForm 
         userType="admin" 
-        // loginUrl="/login" 
-        // loginUrl="/librarian" 
-        // dashboardUrl="/librarian-dashboard" 
       />
     </div>
   );

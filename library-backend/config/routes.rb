@@ -1,14 +1,7 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
   root "books#index"
 
-  # Defines the root path route ("/")
-  # root "posts#index"
-  # Define the signup route
   post '/signup', to: 'users#create' # When a post request is made to /signup we send it to users controller create method
   get '/users', to: 'users#index'  # New route to fetch all users
   post '/add_librarian', to: 'librarians#create' 
@@ -26,4 +19,9 @@ Rails.application.routes.draw do
   get '/borrowing_history/user/:id', to: 'borrows#viewall' # Fetch borrowing history of a specific user
   put '/update_user/:id', to: 'users#update' # update user details
   get '/users/:id', to: 'users#show' # Fetch details of a specific user by ID
+  post '/add_admin', to: 'admins#create'
+  get '/all_librarian', to: 'librarians#index'
+  delete '/delete_librarian/:id', to: 'librarians#destroy'
+  put '/update_librarian/:id', to: 'librarians#update'        # Update details of a specific librarian by ID
+  get '/librarian/:id', to: 'librarians#show' # Fetch details of a specific user by ID
 end

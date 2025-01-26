@@ -6,9 +6,6 @@ function Librarian() {
     <div>
       <LoginForm 
         userType="librarian" 
-        // loginUrl="/login" 
-        // loginUrl="/librarian" 
-        // dashboardUrl="/librarian-dashboard" 
       />
     </div>
   );

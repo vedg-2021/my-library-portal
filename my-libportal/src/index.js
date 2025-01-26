@@ -4,12 +4,18 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './pages/AuthContext';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+// Create a basic Material-UI theme (you can customize this later)
+const theme = createTheme();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AuthProvider>
+    <ThemeProvider theme={theme}>
     <App />
+    </ThemeProvider>
     </AuthProvider>
   </React.StrictMode>
 );

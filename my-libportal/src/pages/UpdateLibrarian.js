@@ -3,42 +3,53 @@ import axios from 'axios';
 import { TextField, Button, Container, Box, Typography, FormControl, FormHelperText, InputLabel, Select, MenuItem } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 
-export default function UpdateBook() {
+export default function UpdateLibrarian() {
     const { id } = useParams();  // Get the book ID from the URL params
     const navigate = useNavigate();  // Used to redirect after update
-    const [book, setBook] = useState({
-        title: '',
-        author: '',
-        publication_date: '',
-        genre: '',
-        availability_status: true,  // default to true (available)
+    const [librarian, setLibrarian] = useState({
+        name: '',
+        email: '',
+        address: '',
+        phone: '',
+        password: '',  // default to true (available)
     });
     const [error, setError] = useState('');
+    const [phoneError, setPhoneError] = useState('');
+
+    if(!(localStorage.getItem('librarian'))) navigate('/');
 
     useEffect(() => {
-        if (!(localStorage.getItem('admin') || localStorage.getItem('librarian'))) {
-            navigate('/');
-        }
-    }, [navigate])
-    useEffect(() => {
         // Fetch the book details from the backend based on the id
-        const fetchBook = async () => {
+        const fetchLibrarian = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/books/${id}`);
-                setBook(response.data);  // Set the book data to state
+                const response = await axios.get(`http://localhost:3000/librarian/${id}`);
+                setLibrarian(response.data);  // Set the book data to state
             } catch (error) {
                 setError('Error fetching book details');
             }
         };
 
-        fetchBook();
+        fetchLibrarian();
     }, [id]);  // Run only when the ID changes (for example, when navigating from one book to another)
+
 
     // Handle form field changes
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setBook({
-            ...book,
+        
+        if (name === "phone") {
+            // Only allow numeric input and ensure it doesn't exceed 10 digits
+            if (/[^0-9]/.test(value)) {
+                return; // Prevent non-numeric input
+            }
+            if (value.length > 10) {
+                return; // Prevent more than 10 digits
+            }
+        }
+
+
+        setLibrarian({
+            ...librarian,
             [name]: value,
         });
     };
@@ -46,8 +57,12 @@ export default function UpdateBook() {
     // Handle form submission to update the book details
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (phoneError) return;
+
         try {
-            await axios.put(`http://localhost:3000/books/${id}`, book);  // PUT request to update the book
+            const response = await axios.put(`http://localhost:3000/update_librarian/${id}`, librarian);  // PUT request to update the book
+            localStorage.setItem('librarian', JSON.stringify(response.data));  // Assuming the response has the updated librarian object
             navigate('/');  // Redirect to the main page after update
         } catch (error) {
             setError('Error updating the book');
@@ -58,16 +73,16 @@ export default function UpdateBook() {
         <Container>
             <Box sx={{ maxWidth: 600, margin: 'auto', padding: 3 }}>
                 <Typography variant="h4" gutterBottom>
-                    Update Book
+                    Update Librarian Details
                 </Typography>
 
                 {error && <Typography color="error">{error}</Typography>}
 
                 <form onSubmit={handleSubmit}>
                     <TextField
-                        label="Title"
-                        name="title"
-                        value={book.title}
+                        label="Name"
+                        name="name"
+                        value={librarian.name}
                         onChange={handleChange}
                         fullWidth
                         variant="outlined"
@@ -76,46 +91,43 @@ export default function UpdateBook() {
                     />
 
                     <TextField
-                        label="Author"
-                        name="author"
-                        value={book.author}
+                        label="Email"
+                        name="email"
+                        value={librarian.email}
                         onChange={handleChange}
                         fullWidth
+                        type="email"
                         variant="outlined"
                         sx={{ marginBottom: 2 }}
                         required
                     />
 
                     <TextField
-                        label="Publication Date"
-                        name="publication_date"
-                        value={book.publication_date}
+                        label="Phone"
+                        name="phone"
+                        value={librarian.phone}
                         onChange={handleChange}
                         fullWidth
                         variant="outlined"
-                        type='date'
+                        sx={{ marginBottom: 2 }}
+                        required
+                        inputprops={{
+                            inputMode: 'numeric',  // Enable numeric input on mobile
+                            pattern: '[0-9]*',      // Only allow numbers in the input field
+                            maxLength: 10,          // Restrict input length to 10 digits
+                        }}
+                    />
+
+                    <TextField
+                        label="Address"
+                        name="address"
+                        value={librarian.address}
+                        onChange={handleChange}
+                        fullWidth
+                        variant="outlined"
                         sx={{ marginBottom: 2 }}
                         required
                     />
-
-                    <FormControl fullWidth required margin="normal">
-                        <InputLabel>Genre</InputLabel>
-                        <Select
-                            value={book.genre}
-                            onChange={handleChange}
-                            label="Genre"
-                            name='genre'
-                        >
-                            <MenuItem value="Fiction">Fiction</MenuItem>
-                            <MenuItem value="Non-Fiction">Non-Fiction</MenuItem>
-                            <MenuItem value="Science">Science</MenuItem>
-                            <MenuItem value="History">History</MenuItem>
-                            <MenuItem value="Biography">Biography</MenuItem>
-                            <MenuItem value="Fantasy">Fantasy</MenuItem>
-                            <MenuItem value="Mystery">Mystery</MenuItem>
-                        </Select>
-                        <FormHelperText>Choose a genre</FormHelperText>
-                    </FormControl>
 
                     <Box sx={{ textAlign: 'center' }}>
                         <Button
@@ -124,7 +136,7 @@ export default function UpdateBook() {
                             color="primary"
                             sx={{ width: '100%', marginTop: 2 }}
                         >
-                            Update Book
+                            Update
                         </Button>
                     </Box>
                 </form>

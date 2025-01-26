@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Typography, Alert, Button } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Typography, Alert, Button, Fab } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import AddIcon from '@mui/icons-material/Add';  // Import the Add icon
 
-function UsersTable() {
+
+function LibrarianTable() {
   // State to hold the users data, loading state, and error messages
-  const [users, setUsers] = useState([]);
+  const [libs, setLibs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -14,7 +16,7 @@ function UsersTable() {
 
   // Check if the user is librarian or admin; if not, redirect to home
   useEffect(() => {
-    const userRole = localStorage.getItem('librarian') || localStorage.getItem('admin');
+    const userRole = localStorage.getItem('admin');
     if (!userRole){
       navigate('/'); // Redirect to home or another page
     }
@@ -23,10 +25,10 @@ function UsersTable() {
 
   // Fetch users data from the backend
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchLibrarians = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/users');
-        setUsers(response.data);  // Save users data to users state we defined above
+        const response = await axios.get('http://localhost:3000/all_librarian');
+        setLibs(response.data);  // Save users data to users state we defined above
         console.log(response.data);
         setLoading(false);         // Stop loading
       } catch (error) {
@@ -35,27 +37,33 @@ function UsersTable() {
       }
     };
 
-    fetchUsers();
+    fetchLibrarians();
   }, []);  // The empty array ensures the effect runs only once after the component mounts
 
 
   // Handle delete operation
-  const handleDelete = async (userId) => {
+  const handleDelete = async (id) => {
     try {
       // Send delete request to your backend
-      await axios.delete(`http://localhost:3000/users/${userId}`);
+      await axios.delete(`http://localhost:3000/delete_librarian/${id}`);
       // Remove the deleted user from the UI state
-      setUsers(users.filter(user => user.id !== userId));
-      setSuccess('User deleted successfully');
+      setLibs(libs.filter(user => user.id !== id));
+      setSuccess('Librarian deleted successfully');
     } catch (error) {
       setError('Error deleting user');
     }
   };
 
+  // Navigate to the add librarian form
+  const handleAddLibrarian = () => {
+    navigate('/add_librarian');
+  };
+
+
   return (
     <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Users List
+        Librarians List
       </Typography>
 
       {/* Display error message */}
@@ -87,22 +95,13 @@ function UsersTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user) => (
+              {libs.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.phone}</TableCell>
                   <TableCell>{user.address}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      component={Link}
-                      to={`/borrowing_history/${user.id}`} // Assuming you have a page to show the borrowing history
-                      sx={{ mr: 1 }}
-                    >
-                      Borrowing History
-                    </Button>
                     <Button
                       variant="outlined"
                       color="secondary"
@@ -117,8 +116,25 @@ function UsersTable() {
           </Table>
         </TableContainer>
       )}
+      {/* Floating action button to add librarian */}
+      <Fab 
+        color="primary" 
+        aria-label="add" 
+        sx={{
+          position: 'fixed',
+          bottom: 16,
+          right: 16,
+          backgroundColor: '#6404eb',
+          '&:hover': {
+            backgroundColor: '#3d00b0', // Color on hover (adjust as needed)
+            },
+        }}
+        onClick={handleAddLibrarian}
+      >
+        <AddIcon />
+      </Fab>
     </Container>
   );
 }
 
-export default UsersTable;
+export default LibrarianTable;

@@ -18,8 +18,8 @@ function AddBook() {
 
   useEffect(() => {
 
-    // Check if the user is a librarian; if not, redirect to home
-    const userRole = localStorage.getItem('librarian');
+    // Check if the user is a librarian or admin; if not, redirect to home
+    const userRole = localStorage.getItem('librarian') || localStorage.getItem('admin');
     if (!userRole){
       navigate('/'); // Redirect to home or another page
     }
@@ -57,7 +57,6 @@ function AddBook() {
     // You can log the book details or send them to your backend here
     setSuccess('New Book Added!');
     setOpen(true);
-    console.log('New Book Added:', newBook);
     try {
       const response = await axios.post('http://localhost:3000/add_book', { book: newBook });
       setSuccess(response.data.message);
@@ -68,7 +67,6 @@ function AddBook() {
       setGenre('');
       setAvailability('');
     } catch (error) {
-      console.error(error);
       setError(error.response.data.errors.join(', '));
     }
 

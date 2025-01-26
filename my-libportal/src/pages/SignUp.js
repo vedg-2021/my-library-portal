@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Container, Box, Typography, Grid, Alert } from '@mui/material';
 import { Link } from 'react-router-dom';  // Import Link from react-router-dom
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function SignUp({ userType="user" }) {
     // State for form fields
@@ -11,10 +12,22 @@ function SignUp({ userType="user" }) {
     const [address, setAddress] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const navigate = useNavigate();  // Use navigate hook for navigation
 
     // State to manage error messages
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
+    // when admin and librarian is not logged in redirect to home
+    console.log("usertype ========> ",userType);
+    useEffect(() => {
+        if(!(localStorage.getItem('admin')) && userType === 'admin'){
+        // const userRole = localStorage.getItem('admin') || localStorage.getItem('librarian');
+        // if (!userRole){
+            navigate('/'); // Redirect to home or another page
+        // }
+    }
+    }, []);
 
     const handleChange = (e) => {
         // Regex to allow only digits
@@ -73,8 +86,15 @@ function SignUp({ userType="user" }) {
             setPassword('');
             setConfirmPassword('');
         } catch (error) {
-            // If there are errors, display them
+            // Log the error for debugging purposes
+        console.error('Error during form submission:', error);
+
+        // Check if error.response and error.response.data are defined
+        if (error.response && error.response.data && Array.isArray(error.response.data.errors)) {
             setError(error.response.data.errors.join(', '));
+        } else {
+            setError('An unexpected error occurred.');
+        }
         }
 
     };

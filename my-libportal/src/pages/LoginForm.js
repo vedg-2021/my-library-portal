@@ -26,9 +26,10 @@ function LoginForm({ userType = "user", loginUrl = "/login", dashboardUrl = "/us
         type: userType,
       });
 
+
       // If login is successful, store the JWT token and user info in localStorage
       localStorage.setItem('token', response.data.token);
-      userType === "librarian" ? localStorage.setItem('librarian', JSON.stringify(response.data.librarian)) : localStorage.setItem('user', JSON.stringify(response.data.user));
+      userType === "librarian" ? localStorage.setItem('librarian', JSON.stringify(response.data.librarian)) : userType === "user" ? localStorage.setItem('user', JSON.stringify(response.data.user)) : localStorage.setItem('admin', JSON.stringify(response.data.admin));
       console.log(response.data.user);
       // Update the authentication state
       setIsAuthenticated(true);
@@ -61,7 +62,7 @@ function LoginForm({ userType = "user", loginUrl = "/login", dashboardUrl = "/us
         }}
       >
         <Typography variant="h5" gutterBottom>
-          {userType === "librarian" ? "Librarian Log In" : "User Log In"}
+          {userType === "librarian" ? "Librarian Log In" : userType === "user" ? "User Log In" : "Admin Log In"}
         </Typography>
 
         {/* Display error message */}
@@ -125,14 +126,14 @@ function LoginForm({ userType = "user", loginUrl = "/login", dashboardUrl = "/us
                   color="inherit">
                   Regular User? Log In Here
                 </Button>
-              ) : (
+              ) : userType === "user" ? (
                 <Button 
                   component={Link}
                   to="/signup"
                   color="inherit">
                   Don't have an account? Sign Up
                 </Button>
-              )}
+              ) : (null)}
             </Grid>
           </Grid>
         </form>

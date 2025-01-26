@@ -1,32 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Card, CardMedia, Stack, Typography, IconButton, Box, Container, Button, Modal, Backdrop, Fade } from '@mui/material';
-import { use } from 'react';
+import { Card, CardMedia, Stack, Typography, IconButton, Box, Container, Button, Modal, Backdrop, Fade, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 export default function AllBooks() {
-    const [paused, setPaused] = React.useState(true);
     const [error, setError] = useState('');
     const [books, setBooks] = useState([]);
     const [isLibrarian, setIsLibrarian] = useState(false); // To track if the user is a librarian
+    const [isAdmin, setIsAdmin] = useState(false); // To track if the user is a librarian
     const [borrowedBooks, setBorrowedBooks] = useState([]); // To track books borrowed by the user
     const [userId, setUserId] = useState(); // Store the logged-in user's ID
     const [selectedBook, setSelectedBook] = useState(null); // Track selected book for the modal
     const [openModal, setOpenModal] = useState(false); // Control modal open/close
+    const [searchQuery, setSearchQuery] = useState(''); // State to store search query
+    const [filteredBooks, setFilteredBooks] = useState([]);  // Add a state for filtered books
 
 
-    // Fetch users data from the backend
+
+
+    // Fetch books data from the backend
     useEffect(() => {
         const fetchBooks = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/');
                 setBooks(response.data);  // Save users data to users state we defined above
-                // console.log(response.data);
-                // setLoading(false);         // Stop loading
+                setFilteredBooks(response.data);  // Initially, all books are displayed
             } catch (error) {
                 setError('Error fetching Books');
-                // setLoading(false);
             }
         };
 
@@ -35,12 +36,14 @@ export default function AllBooks() {
         if (librarian) {
             setIsLibrarian(true); // Set isLibrarian to true if librarian data exists in localStorage
         }
+        const admin = localStorage.getItem('admin');
+        if (admin) {
+            setIsAdmin(true); // Set isLibrarian to true if admin data exists in localStorage
+        }
         const token = localStorage.getItem('user'); // Assuming token is saved in localStorage after login
         if (token) {
             const currentUser = JSON.parse(localStorage.getItem('user'));
-            console.log("user object returned,", currentUser);
             setUserId(currentUser.id); // Set the logged-in user's ID
-            console.log("user id we'll send to backend, ", currentUser.id);
         }
 
         fetchBooks();
@@ -51,19 +54,31 @@ export default function AllBooks() {
           // Fetch the user's borrowing history
       const fetchBorrowedBooks = async () => {
         try {
-          console.log("current user,", userId);
           const response = await axios.get(`http://localhost:3000/borrowing_history/${userId}`);
           setBorrowedBooks(response.data); // Set the books the user has borrowed
-          console.log("response received,", response.data);
         } catch (error) {
-          console.error('Error fetching borrowing history');
           setError('Error fetching borrowing history');
         }
       };
 
       fetchBorrowedBooks();
     }
-  }, [userId]);  
+  }, [userId]);
+  
+  // Search books based on the query
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase(); // Convert search query to lowercase
+    setSearchQuery(query);
+    if (query === '') {
+        setFilteredBooks(books); // If query is empty, show all books
+    } else {
+        const filtered = books.filter(book => 
+            book.title.toLowerCase().includes(query) || 
+            book.author.toLowerCase().includes(query)
+        );
+        setFilteredBooks(filtered); // Filter books based on title or author
+    }
+};
 
     // Handle Borrow operation
     const handleBorrow = async (bookId, event) => {
@@ -133,6 +148,16 @@ export default function AllBooks() {
     return (
         <div>
             <h1>Books</h1>
+            <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
+                <TextField
+                    label="Search Books"
+                    variant="outlined"
+                    fullWidth
+                    value={searchQuery}
+                    onChange={handleSearch}
+                    sx={{ maxWidth: 500 }}
+                />
+            </Box>
             <Container>
                 <Box sx={{
                     display: 'flex',
@@ -141,13 +166,8 @@ export default function AllBooks() {
                     flexWrap: 'wrap',
                     gap: 2,
                     padding: 2,
-                    // width: { xs: '100%', sm: 'auto' }, // 25% width for sm+ screens, with space for gap
-                    // flexDirection: { xs: 'column', sm: 'row', flexWrap: 'wrap' },
-                    // // alignItems: 'center',
-                    // // borderRadius: 2,
-                    // boxSizing: 'border-box'
                 }}>
-                    {books.map((book) => (
+                    {filteredBooks.map((book) => (
                         <Card
                             key={book.id}
                             variant="outlined"
@@ -210,7 +230,7 @@ export default function AllBooks() {
                                     marginTop: 'auto',            // Push button down to the bottom
                                     width: '100%',
                                 }}>
-                                    {isLibrarian ? (
+                                    {(isLibrarian || isAdmin) ? (
                                         <Box sx={{ display: 'flex', gap: 1 }}>
                                             <Button
                                                 variant="outlined"
@@ -286,13 +306,13 @@ export default function AllBooks() {
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: 400,
+                        width: { xs: '90%', sm: 400 }, // 90% width on small screens, 400px on larger ones
+                        maxHeight: '80vh', // Prevent the modal from overflowing vertically
                         bgcolor: 'background.paper',
                         borderRadius: 2,
                         boxShadow: 24,
                         p: 4,
-                        maxHeight: '80vh',
-                        overflow: 'auto',
+                        overflowY: 'auto', // Allow vertical scrolling if content overflows
                     }}>
                         <IconButton
                             onClick={handleCloseModal}
