@@ -15,4 +15,15 @@ Rails.application.routes.draw do
   post '/add_book', to: 'books#create'
   post '/borrow_book', to: 'borrows#borrow'
   get '/book', to: 'books#index'
+  post '/login', to: 'sessions#create'
+  get '/books/:id', to: 'books#show'          # Fetch details of a specific book by ID
+  put '/books/:id', to: 'books#update'        # Update details of a specific book by ID
+  delete '/books/:id', to: 'books#destroy'    # Delete a specific book by ID
+  delete '/users/:id', to: 'users#destroy'    # Delete a specific user by ID
+  get '/borrowing_history', to: 'borrows#index' # Fetch borrowing history of a user
+  get '/borrowing_history/:id', to: 'borrows#show' # Fetch borrowing history of a specific user
+  put '/return_book', to: 'borrows#return_book' # Return a borrowed book
+  get '/borrowing_history/user/:id', to: 'borrows#viewall' # Fetch borrowing history of a specific user
+  put '/update_user/:id', to: 'users#update' # update user details
+  get '/users/:id', to: 'users#show' # Fetch details of a specific user by ID
 end

@@ -18,6 +18,35 @@ class UsersController < ApplicationController
         render json: @users
     end
 
+    def destroy
+      @user = User.find_by(id: params[:id])
+      if @user
+        @user.destroy
+        render json: { message: "User deleted successfully" }, status: :ok
+      else
+        render json: { error: "User not found" }, status: :not_found
+      end
+    end
+
+    def update
+      @user = User.find_by(id: params[:id])
+      if @user
+        @user.update(user_params)
+        render json: @user, status: :ok
+      else
+        render json: { error: "User not found" }, status: :not_found
+      end
+    end
+
+    def show
+      @user = User.find_by(id: params[:id])
+      if @user
+        render json: @user
+      else
+        render json: { error: "User not found" }, status: :not_found
+      end
+    end
+
   
     private
   

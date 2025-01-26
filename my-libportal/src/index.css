@@ -24,3 +24,14 @@ code {
   background-color: #3b008e !important;
 }
 
+/* I've changed color of all buttons to #6404eb */
+.MuiButton-outlined {
+  border-color: #6404eb !important;
+  color: #6404eb !important;                
+  border-radius: 4px;         
+}
+
+.MuiButton-outlined:disabled{
+  border-color: rgba(0, 0, 0, 0.12) !important; /* Default disabled border color */
+  color: rgba(0, 0, 0, 0.38) !important; /* Default disabled text color */         
+}

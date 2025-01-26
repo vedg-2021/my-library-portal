@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext} from 'react';
 import { TextField, Button, Container, Box, Typography, Grid, Alert } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
+import AuthContext from './AuthContext';
 
 function LoginForm({ userType = "user", loginUrl = "/login", dashboardUrl = "/user-dashboard" }) {
   // State for form fields
@@ -9,33 +11,38 @@ function LoginForm({ userType = "user", loginUrl = "/login", dashboardUrl = "/us
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const { setIsAuthenticated } = useContext(AuthContext);
+
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(e);
 
-    // Simulate login logic for user or librarian
-    if (userType === "librarian") {
-      // For librarian login: hardcoded for now
-      if (email === 'librarian@example.com' && password === 'librarian123') {
-        setError('');
-        setSuccess('Librarian logged in successfully!');
-        navigate(dashboardUrl); // Redirect to librarian dashboard
-      } else {
-        setError('Invalid librarian credentials. Please try again.');
-        setSuccess('');
-      }
-    } else {
-      // For user login: hardcoded for now
-      if (email === 'user@example.com' && password === 'user123') {
-        setError('');
-        setSuccess('User logged in successfully!');
-        navigate(dashboardUrl); // Redirect to user dashboard
-      } else {
-        setError('Invalid user credentials. Please try again.');
-        setSuccess('');
-      }
+    try {
+      const response = await axios.post("http://localhost:3000/login", {
+        email: email,
+        password: password,
+        type: userType,
+      });
+
+      // If login is successful, store the JWT token and user info in localStorage
+      localStorage.setItem('token', response.data.token);
+      userType === "librarian" ? localStorage.setItem('librarian', JSON.stringify(response.data.librarian)) : localStorage.setItem('user', JSON.stringify(response.data.user));
+      console.log(response.data.user);
+      // Update the authentication state
+      setIsAuthenticated(true);
+      navigate('/');
+      // Display success message
+      setError('');
+      setSuccess(response.data.message);
+      
+
+    } catch (error) {
+      console.log(error);
+      setSuccess('');
+      // If there are errors, display them
+      setError(error.response.data.errors || 'Something went wrong');
     }
   };
 
@@ -112,17 +119,19 @@ function LoginForm({ userType = "user", loginUrl = "/login", dashboardUrl = "/us
           <Grid container justifyContent="flex-end">
             <Grid item>
               {userType === "librarian" ? (
-                <Link to="/login" style={{ color: 'inherit'}}>
-                <Button color="inherit">
+                <Button 
+                  component={Link}
+                  to="/login"
+                  color="inherit">
                   Regular User? Log In Here
                 </Button>
-                </Link>
               ) : (
-                <Link to="/signup" style={{ color: 'inherit'}}>
-                <Button color="inherit" href="/signup">
+                <Button 
+                  component={Link}
+                  to="/signup"
+                  color="inherit">
                   Don't have an account? Sign Up
                 </Button>
-                </Link>
               )}
             </Grid>
           </Grid>

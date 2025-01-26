@@ -18,16 +18,13 @@ class BorrowsController < ApplicationController
     end
 
     def show
-        @borrow = Borrow.where(user_id: params[:id])
-        if @borrow
-            render json: @borrow
-        else
-            render json: {error: "Borrow not found"}, status: :not_found
-        end
+        # @borrow = Borrow.where(user_id: params[:id])
+        # if @borrow
+        #     render json: @borrow
+        # else
+        #     render json: {error: "Borrow not found"}, status: :not_found
+        # end
 
-    end
-
-    def viewall
         # Fetch the user
         @user = User.find_by(id: params[:id])
         

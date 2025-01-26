@@ -5,7 +5,7 @@ import { Container, Table, TableBody, TableCell, TableContainer, TableHead, Tabl
 
 function UsersTable() {
   // State to hold the users data, loading state, and error messages
-  const [users, setUsers] = useState([]);
+  const [borrows, setBorrows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -13,10 +13,10 @@ function UsersTable() {
 
   // Fetch users data from the backend
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchBorrows = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/users');
-        setUsers(response.data);  // Save users data to users state we defined above
+        const response = await axios.get('http://localhost:3000/borrowing_history');
+        setBorrows(response.data);  // Save users data to users state we defined above
         console.log(response.data);
         setLoading(false);         // Stop loading
       } catch (error) {
@@ -25,7 +25,7 @@ function UsersTable() {
       }
     };
 
-    fetchUsers();
+    fetchBorrows();
   }, []);  // The empty array ensures the effect runs only once after the component mounts
 
 
@@ -35,7 +35,7 @@ function UsersTable() {
       // Send delete request to your backend
       await axios.delete(`http://localhost:3000/users/${userId}`);
       // Remove the deleted user from the UI state
-      setUsers(users.filter(user => user.id !== userId));
+      setBorrows(borrows.filter(user => user.id !== userId));
       setSuccess('User deleted successfully');
     } catch (error) {
       setError('Error deleting user');
@@ -69,38 +69,19 @@ function UsersTable() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Phone</TableCell>
-                <TableCell>Address</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell>Book Id</TableCell>
+                <TableCell>User Id</TableCell>
+                <TableCell>Borrowed On</TableCell>
+                <TableCell>Returned On</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.phone}</TableCell>
-                  <TableCell>{user.address}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      component={Link}
-                      to={`/borrowing_history/${user.id}`} // Assuming you have a page to show the borrowing history
-                      sx={{ mr: 1 }}
-                    >
-                      Borrowing History
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      onClick={() => handleDelete(user.id)} // Trigger delete function
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
+              {borrows.map((record) => (
+                <TableRow key={record.id}>
+                  <TableCell>{record.book_id}</TableCell>
+                  <TableCell>{record.user_id}</TableCell>
+                  <TableCell>{record.borrowed_on}</TableCell>
+                  <TableCell>{record.returned_on === null ? "Not Returned" : record.returned_on}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

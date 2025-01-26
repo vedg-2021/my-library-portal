@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Container, Box, Typography, MenuItem, Select, InputLabel, FormControl, FormHelperText, Alert } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function AddBook() {
   // State to manage form inputs
@@ -12,8 +13,17 @@ function AddBook() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [open, setOpen] = useState(true);
+  const navigate = useNavigate(); // Use history hook for navigation
+
 
   useEffect(() => {
+
+    // Check if the user is a librarian; if not, redirect to home
+    const userRole = localStorage.getItem('librarian');
+    if (!userRole){
+      navigate('/'); // Redirect to home or another page
+    }
+
     if (success) {
       const timer = setTimeout(() => {
         setOpen(false);
@@ -26,7 +36,7 @@ function AddBook() {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Simple validation
     if (!title || !author || !publication_date || !genre || !availability_status) {
       setError('All fields are required.');
@@ -49,17 +59,17 @@ function AddBook() {
     setOpen(true);
     console.log('New Book Added:', newBook);
     try {
-        const response = await axios.post('http://localhost:3000/add_book', {book:newBook});
-        setSuccess(response.data.message);
-        // Reset form fields
-        setTitle('');
-        setAuthor('');
-        setPublicationDate('');
-        setGenre('');
-        setAvailability('');
+      const response = await axios.post('http://localhost:3000/add_book', { book: newBook });
+      setSuccess(response.data.message);
+      // Reset form fields
+      setTitle('');
+      setAuthor('');
+      setPublicationDate('');
+      setGenre('');
+      setAvailability('');
     } catch (error) {
-        console.error(error);
-        setError(error.response.data.errors.join(', '));
+      console.error(error);
+      setError(error.response.data.errors.join(', '));
     }
 
   };
@@ -90,9 +100,9 @@ function AddBook() {
         )}
 
         {open && success && (
-            <Alert severity="success" sx={{ width: '100%', mb: 2 }}>
-                {success}
-            </Alert>
+          <Alert severity="success" sx={{ width: '100%', mb: 2 }}>
+            {success}
+          </Alert>
         )}
 
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
