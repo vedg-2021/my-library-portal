@@ -19,6 +19,7 @@ import UpdateUser from './pages/UpdateUser';
 import Admin from './pages/Admin';
 import LibrarianTable from './pages/LibrarianTable';
 import UpdateLibrarian from './pages/UpdateLibrarian';
+import ApproveUsers from './pages/ApproveUsers';
 
 function App() {
 
@@ -43,6 +44,7 @@ function App() {
         <Route exact path="/admin" element={<Admin />} /> {/* login for admin */}
         <Route exact path="/all_librarian" element={<LibrarianTable />} /> {/* All Librarians Table */}
         <Route exact path="/update_librarian/:id" element={<UpdateLibrarian />} /> {/* Update Profile details of librarian */}
+        <Route exact path="/unapproved_users" element={<ApproveUsers />} /> {/* Approve user available to librarian and admin */}
       </Routes>
     </Router>
     </div>

@@ -61,6 +61,13 @@ class BorrowsController < ApplicationController
         end
     end
 
+    def showall
+        @all = Borrow.where(returned_on: nil)
+        if @all
+            render json: @all, status: :ok
+        end
+    end
+
     private
 
     

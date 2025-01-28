@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Card, CardMedia, Stack, Typography, IconButton, Box, Container, Button, Modal, Backdrop, Fade, TextField } from '@mui/material';
+import { Card, CardMedia, Stack, Typography, IconButton, Box, Container, Button, Modal, Backdrop, Fade, TextField, Chip } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
+import { addDays, format } from 'date-fns';
+
 
 export default function AllBooks() {
     const [error, setError] = useState('');
@@ -15,7 +18,7 @@ export default function AllBooks() {
     const [openModal, setOpenModal] = useState(false); // Control modal open/close
     const [searchQuery, setSearchQuery] = useState(''); // State to store search query
     const [filteredBooks, setFilteredBooks] = useState([]);  // Add a state for filtered books
-    const maxTitleLength = 35;
+    const [allBorrowedBooks, setAllBorroweBooks] = useState([]);  // Add a state for filtered books
 
 
 
@@ -46,7 +49,17 @@ export default function AllBooks() {
             setUserId(currentUser.id); // Set the logged-in user's ID
         }
 
+        const fetchAllBorrowedBooks = async () => {
+            try {
+                const all_borrowed_response = await axios.get('http://localhost:3000/all_borrowed');
+                setAllBorroweBooks(all_borrowed_response.data);
+            } catch(error) {
+                console.log("Not able to fetch all borrowed books from borrowed table because: ",error);
+            }
+        };
+
         fetchBooks();
+        fetchAllBorrowedBooks();
     }, []);
 
     useEffect(() => {
@@ -65,7 +78,6 @@ export default function AllBooks() {
                     setError('Error fetching borrowing history');
                 }
             };
-
             fetchBorrowedBooks();
         }
     }, [userId]);
@@ -186,123 +198,171 @@ export default function AllBooks() {
                 }}>
                     {filteredBooks.map((book) => (
                         <Card
-                        key={book.id}
-                        variant="outlined"
-                        sx={{
-                            width: { xs: '100%', sm: '250px' },
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: 1,  // Adjust gap for the new row-based layout
-                            padding: 2,
-                            minHeight: '200px',  // Ensure there's enough space for all rows
-                            boxSizing: 'border-box',
-                            borderRadius: 2,
-                            cursor: 'pointer',
-                        }}
-                        onClick={() => handleOpenModal(book)}
-                    >
-                        {/* Row 1: Book Title */}
-                        <Typography
-                            color="text.primary"
-                            fontWeight="semiBold"
+                            key={book.id}
+                            variant="outlined"
                             sx={{
-                                display: '-webkit-box',
-                                whiteSpace: 'normal',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                WebkitBoxOrient: 'vertical',
-                                WebkitLineClamp: 2, // Limit to 2 lines and add ellipsis if needed
-                                maxWidth: '150px',  // Adjust width to match layout
-                                textAlign: 'center',
+                                width: { xs: '100%', sm: '250px' },
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: 1,  // Adjust gap for the new row-based layout
+                                padding: 2,
+                                minHeight: '200px',  // Ensure there's enough space for all rows
+                                boxSizing: 'border-box',
+                                borderRadius: 2,
+                                cursor: 'pointer',
                             }}
+                            onClick={() => handleOpenModal(book)}
                         >
-                            {book.title}
-                        </Typography>
-                    
-                    
-                        {/* Row 3: Author Name */}
-                        <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            fontWeight="medium"
-                            textAlign="center"
-                            sx={{ width: '100%', display: 'inline-block' }}
-                        >
-                            {book.author}
-                        </Typography>
-                    
-                        {/* Row 4: Buttons */}
-                        <Box sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 1,  // Space between buttons
-                            marginTop: 'auto',  // Push buttons to the bottom
-                            width: '100%',
-                        }}>
-                            {/* Admin or Librarian */}
-                            {(isLibrarian || isAdmin) ? (
-                                <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
-                                    <Button
-                                        variant="outlined"
-                                        sx={{
-                                            textTransform: 'none',
-                                            width: '48%',
-                                            height: '48px',  // Consistent height for the buttons
-                                        }}
-                                        component={Link}
-                                        to={`/update_book/${book.id}`}
-                                        onClick={(event) => handleUpdate(book.id, event)}
-                                    >
-                                        Update
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        sx={{
-                                            textTransform: 'none',
-                                            width: '48%',
-                                            height: '48px',  // Consistent height for the buttons
-                                        }}
-                                        onClick={(event) => handleDelete(book.id, event)}
-                                    >
-                                        Delete
-                                    </Button>
-                                </Box>
-                            ) : (
-                                <>
-                                    {/* User-specific Buttons (Borrow or Return) */}
-                                    {borrowedBooks.some(borrowedBook => borrowedBook.book_id === book.id && borrowedBook.returned_on === null) ? (
+                            {/* Row 1: Book Title */}
+                            <Typography
+                                color="text.primary"
+                                fontWeight="semiBold"
+                                sx={{
+                                    display: '-webkit-box',
+                                    whiteSpace: 'normal',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    WebkitBoxOrient: 'vertical',
+                                    WebkitLineClamp: 2, // Limit to 2 lines and add ellipsis if needed
+                                    maxWidth: '150px',  // Adjust width to match layout
+                                    textAlign: 'center',
+                                }}
+                            >
+                                {book.title}
+                            </Typography>
+
+
+                            {/* Row 3: Author Name */}
+                            <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                fontWeight="medium"
+                                textAlign="center"
+                                sx={{ width: '100%', display: 'inline-block' }}
+                            >
+                                {book.author}
+                            </Typography>
+
+
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 1,  // Space between buttons
+                                marginTop: 'auto',  // Push buttons to the bottom
+                                width: '100%',
+                            }}>
+                            {book.availability_status ? null :
+                                (() => {
+                                    // Find the borrowed book entry
+                                    const borrowedBook = allBorrowedBooks.find(b => b.book_id === book.id && b.returned_on === null);
+
+                                    console.log("HELLO",borrowedBook)
+
+                                    let label = 'Available on: ';  // Default label if not borrowed
+
+                                    if (borrowedBook) {
+                                        // If borrowed, calculate the "Available on" date (7 days after borrowed_on)
+                                        const borrowedDate = new Date(borrowedBook.borrowed_on); // Convert borrowed_on to Date object
+                                        const availableDate = addDays(borrowedDate, 7); // Add 7 days
+                                        label = `Available on: ${format(availableDate, 'MMM dd, yyyy')}`; // Format and set the label
+                                    }
+
+                                    return (
+                                        <Chip
+                                            size="small"
+                                            variant="outlined"
+                                            icon={<InfoRoundedIcon />}
+                                            label={label}  // Use the precomputed label
+                                            sx={(theme) => {
+                                                const isDarkMode = theme.palette.mode === 'light';
+                                                return {
+                                                    marginTop: 'auto',
+                                                    '.MuiChip-icon': { fontSize: 16, ml: '4px', color: isDarkMode ? '#4caf50' : '#388e3c' },
+                                                    bgcolor: !isDarkMode ? '#2c6b29' : '#c8e6c9',
+                                                    borderColor: !isDarkMode ? '#1b5e20' : '#81c784',
+                                                    color: !isDarkMode ? '#c8e6c9' : '#2c6b29',
+                                                };
+                                            }}
+                                        />
+                                    );
+                                })()
+                            }
+
+                            </Box>
+
+
+                            {/* Row 4: Buttons */}
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 1,  // Space between buttons
+                                marginTop: 'auto',  // Push buttons to the bottom
+                                width: '100%',
+                            }}>
+                                {/* Admin or Librarian */}
+                                {(isLibrarian || isAdmin) ? (
+                                    <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
                                         <Button
                                             variant="outlined"
                                             sx={{
                                                 textTransform: 'none',
-                                                width: '100%',  // Full width for Return
+                                                width: '48%',
                                                 height: '48px',  // Consistent height for the buttons
-                                                backgroundColor: '#e7ffcd',  // Styling for return button
                                             }}
-                                            onClick={(event) => handleReturn(book.id, event)}
+                                            component={Link}
+                                            to={`/update_book/${book.id}`}
+                                            onClick={(event) => handleUpdate(book.id, event)}
                                         >
-                                            Return
+                                            Update
                                         </Button>
-                                    ) : (
                                         <Button
-                                            disabled={book.availability_status === false}
                                             variant="outlined"
                                             sx={{
                                                 textTransform: 'none',
-                                                width: '100%',  // Full width for Borrow
+                                                width: '48%',
                                                 height: '48px',  // Consistent height for the buttons
                                             }}
-                                            onClick={(event) => handleBorrow(book.id, event)}
+                                            onClick={(event) => handleDelete(book.id, event)}
                                         >
-                                            {book.availability_status ? 'Borrow' : 'Unavailable'}
+                                            Delete
                                         </Button>
-                                    )}
-                                </>
-                            )}
-                        </Box>
-                    </Card>
-                    
+                                    </Box>
+                                ) : (
+                                    <>
+                                        {/* User-specific Buttons (Borrow or Return) */}
+                                        {borrowedBooks.some(borrowedBook => borrowedBook.book_id === book.id && borrowedBook.returned_on === null) ? (
+                                            <Button
+                                                variant="outlined"
+                                                sx={{
+                                                    textTransform: 'none',
+                                                    width: '100%',  // Full width for Return
+                                                    height: '48px',  // Consistent height for the buttons
+                                                    backgroundColor: '#e7ffcd',  // Styling for return button
+                                                }}
+                                                onClick={(event) => handleReturn(book.id, event)}
+                                            >
+                                                Return
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                disabled={book.availability_status === false}
+                                                variant="outlined"
+                                                sx={{
+                                                    textTransform: 'none',
+                                                    width: '100%',  // Full width for Borrow
+                                                    height: '48px',  // Consistent height for the buttons
+                                                }}
+                                                onClick={(event) => handleBorrow(book.id, event)}
+                                            >
+                                                {book.availability_status ? 'Borrow' : 'Unavailable'}
+                                            </Button>
+                                        )}
+                                    </>
+                                )}
+                            </Box>
+                        </Card>
+
 
                     ))}
                 </Box>

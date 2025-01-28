@@ -75,6 +75,8 @@ function SignUp({ userType="user" }) {
                 console.log('Librarian Info:', response.data.librarian);
             }
 
+            setTimeout(() => {navigate('/login');}, 3000);
+
             setName('');
             setEmail('');
             setPhone('');

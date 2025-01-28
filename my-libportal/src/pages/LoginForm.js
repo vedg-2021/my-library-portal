@@ -40,10 +40,10 @@ function LoginForm({ userType = "user", loginUrl = "/login", dashboardUrl = "/us
       
 
     } catch (error) {
-      console.log(error);
+      console.log("error hai yeh", error);
       setSuccess('');
       // If there are errors, display them
-      setError(error.response.data.errors || 'Something went wrong');
+      setError(error.response.data.message);
     }
   };
 
