@@ -56,6 +56,11 @@ export default function AllBooks() {
         try {
           const response = await axios.get(`http://localhost:3000/borrowing_history/${userId}`);
           setBorrowedBooks(response.data); // Set the books the user has borrowed
+          // Update the books state to reflect the borrowed books
+          setBooks((prevBooks) => prevBooks.map((book) => {
+            const borrowedBook = response.data.find(b => b.book_id === book.id);
+            return borrowedBook ? { ...book, availability_status: false } : book;
+        }));
         } catch (error) {
           setError('Error fetching borrowing history');
         }
@@ -74,7 +79,7 @@ export default function AllBooks() {
     } else {
         const filtered = books.filter(book => 
             book.title.toLowerCase().includes(query) || 
-            book.author.toLowerCase().includes(query)
+            book.author.toLowerCase().includes(query) || book.genre.toLowerCase().includes(query)
         );
         setFilteredBooks(filtered); // Filter books based on title or author
     }
@@ -99,13 +104,24 @@ export default function AllBooks() {
         try {
             await axios.put(`http://localhost:3000/return_book`, {book_id: bookId, user_id: userId});
             // Update the books list after returning the book
-            setBooks(prevBooks => 
-                prevBooks.map(book => 
+            setBooks(prevBooks =>
+                prevBooks.map(book =>
                     book.id === bookId ? { ...book, availability_status: true } : book
                 )
             ); // Set the book's availability to true (indicating it is now available)
 
-            setBorrowedBooks(prevBooks => prevBooks.filter(borrowedBook => borrowedBook.book_id !== bookId)); // Remove the book from the borrowed list
+        // Update the borrowedBooks state to remove the returned book
+        setBorrowedBooks(prevBooks =>
+            prevBooks.filter(borrowedBook => borrowedBook.book_id !== bookId)
+        );
+
+        // Also update filteredBooks if you are using it for displaying results
+        setFilteredBooks(prevBooks =>
+            prevBooks.map(book =>
+                book.id === bookId ? { ...book, availability_status: true } : book
+            )
+        );
+        
         } catch (error) {
             setError('Error returning the book');
         }
@@ -118,8 +134,9 @@ export default function AllBooks() {
         try {
             // Send delete request to your backend
             await axios.delete(`http://localhost:3000/books/${bookId}`);
-            // Remove the deleted book from the UI state
-            setBooks(books.filter(book => book.id !== bookId));
+        // Remove the deleted book from the UI state
+        setBooks((prevBooks) => prevBooks.filter(book => book.id !== bookId));
+        setFilteredBooks(prevBooks => prevBooks.filter(book => book.id !== bookId)); // Also update the filtered books state
         } catch (error) {
             setError('Error deleting the book');
         }

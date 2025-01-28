@@ -19,10 +19,25 @@ class UsersController < ApplicationController
     end
 
     def destroy
+      # @user = User.find_by(id: params[:id])
+      # if @user
+      #   @user.destroy
+      #   render json: { message: "User deleted successfully" }, status: :ok
+      # else
+      #   render json: { error: "User not found" }, status: :not_found
+      # end
+
       @user = User.find_by(id: params[:id])
+
       if @user
-        @user.destroy
-        render json: { message: "User deleted successfully" }, status: :ok
+        # Check if the user has any borrow records where 'returned_on' is null
+        if @user.borrows.where(returned_on: nil).exists?
+          render json: { error: "User has borrowed books that haven't been returned and cannot be deleted" }, status: :unprocessable_entity
+        else
+          # Proceed with deletion if no borrow records with 'returned_on' is null
+          @user.destroy
+          render json: { message: "User deleted successfully" }, status: :ok
+        end
       else
         render json: { error: "User not found" }, status: :not_found
       end

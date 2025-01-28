@@ -134,7 +134,7 @@ export default function UpdateUser() {
                             color="primary"
                             sx={{ width: '100%', marginTop: 2 }}
                         >
-                            Update Book
+                            Update Details
                         </Button>
                     </Box>
                 </form>

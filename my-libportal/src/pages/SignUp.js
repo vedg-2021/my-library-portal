@@ -22,16 +22,12 @@ function SignUp({ userType="user" }) {
     console.log("usertype ========> ",userType);
     useEffect(() => {
         if(!(localStorage.getItem('admin')) && userType === 'admin'){
-        // const userRole = localStorage.getItem('admin') || localStorage.getItem('librarian');
-        // if (!userRole){
             navigate('/'); // Redirect to home or another page
-        // }
     }
     }, []);
 
     const handleChange = (e) => {
-        // Regex to allow only digits
-        const regex = /^[0-9]{0,10}$/;  // Only digits allowed
+        const regex = /^[0-9]{0,10}$/;  // Only 10 characters allowed all of them have to be numbers/digits
         const inputValue = e.target.value;
 
         // If the input matches the regex (only digits), update the phone state

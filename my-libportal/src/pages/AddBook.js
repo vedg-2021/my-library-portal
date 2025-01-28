@@ -51,14 +51,18 @@ function AddBook() {
       author,
       publication_date,
       genre,
-      availability_status,
+      // availability_status,
+      availability_status: availability_status === 'true' ? true : false, // Make sure it's a boolean
     };
 
     // You can log the book details or send them to your backend here
     setSuccess('New Book Added!');
     setOpen(true);
     try {
-      const response = await axios.post('http://localhost:3000/add_book', { book: newBook });
+      // const response = await axios.post('http://localhost:3000/add_book', { book: newBook });
+      const response = await axios.post('http://localhost:3002/add_book', newBook);
+      console.log("hellooooooooooo"); // This will print the response to console
+      console.log("Response from backend:", response.data); // This will print the response to console
       setSuccess(response.data.message);
       // Reset form fields
       setTitle('');
@@ -67,7 +71,17 @@ function AddBook() {
       setGenre('');
       setAvailability('');
     } catch (error) {
-      setError(error.response.data.errors.join(', '));
+      // setError(error.response.data.errors.join(', '));
+      if (error.response) {
+        // Request was made, and the server responded with a status code
+        setError(error.response.data.errors?.join(', ') || 'An error occurred');
+      } else if (error.request) {
+        // The request was made but no response was received
+        setError('No response from the server');
+      } else {
+        // Something happened in setting up the request
+        setError('Error setting up request');
+      }
     }
 
   };
