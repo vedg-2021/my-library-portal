@@ -15,7 +15,7 @@ export default function AllBooks() {
     const [openModal, setOpenModal] = useState(false); // Control modal open/close
     const [searchQuery, setSearchQuery] = useState(''); // State to store search query
     const [filteredBooks, setFilteredBooks] = useState([]);  // Add a state for filtered books
-
+    const maxTitleLength = 35;
 
 
 
@@ -51,39 +51,39 @@ export default function AllBooks() {
 
     useEffect(() => {
         if (userId) {
-          // Fetch the user's borrowing history
-      const fetchBorrowedBooks = async () => {
-        try {
-          const response = await axios.get(`http://localhost:3000/borrowing_history/${userId}`);
-          setBorrowedBooks(response.data); // Set the books the user has borrowed
-          // Update the books state to reflect the borrowed books
-          setBooks((prevBooks) => prevBooks.map((book) => {
-            const borrowedBook = response.data.find(b => b.book_id === book.id);
-            return borrowedBook ? { ...book, availability_status: false } : book;
-        }));
-        } catch (error) {
-          setError('Error fetching borrowing history');
-        }
-      };
+            // Fetch the user's borrowing history
+            const fetchBorrowedBooks = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:3000/borrowing_history/${userId}`);
+                    setBorrowedBooks(response.data); // Set the books the user has borrowed
+                    // Update the books state to reflect the borrowed books
+                    setBooks((prevBooks) => prevBooks.map((book) => {
+                        const borrowedBook = response.data.find(b => b.book_id === book.id);
+                        return borrowedBook ? { ...book, availability_status: false } : book;
+                    }));
+                } catch (error) {
+                    setError('Error fetching borrowing history');
+                }
+            };
 
-      fetchBorrowedBooks();
-    }
-  }, [userId]);
-  
-  // Search books based on the query
-  const handleSearch = (e) => {
-    const query = e.target.value.toLowerCase(); // Convert search query to lowercase
-    setSearchQuery(query);
-    if (query === '') {
-        setFilteredBooks(books); // If query is empty, show all books
-    } else {
-        const filtered = books.filter(book => 
-            book.title.toLowerCase().includes(query) || 
-            book.author.toLowerCase().includes(query) || book.genre.toLowerCase().includes(query)
-        );
-        setFilteredBooks(filtered); // Filter books based on title or author
-    }
-};
+            fetchBorrowedBooks();
+        }
+    }, [userId]);
+
+    // Search books based on the query
+    const handleSearch = (e) => {
+        const query = e.target.value.toLowerCase(); // Convert search query to lowercase
+        setSearchQuery(query);
+        if (query === '') {
+            setFilteredBooks(books); // If query is empty, show all books
+        } else {
+            const filtered = books.filter(book =>
+                book.title.toLowerCase().includes(query) ||
+                book.author.toLowerCase().includes(query) || book.genre.toLowerCase().includes(query)
+            );
+            setFilteredBooks(filtered); // Filter books based on title or author
+        }
+    };
 
     // Handle Borrow operation
     const handleBorrow = async (bookId, event) => {
@@ -102,7 +102,7 @@ export default function AllBooks() {
     const handleReturn = async (bookId, event) => {
         event.stopPropagation(); // Prevent modal from opening
         try {
-            await axios.put(`http://localhost:3000/return_book`, {book_id: bookId, user_id: userId});
+            await axios.put(`http://localhost:3000/return_book`, { book_id: bookId, user_id: userId });
             // Update the books list after returning the book
             setBooks(prevBooks =>
                 prevBooks.map(book =>
@@ -110,18 +110,18 @@ export default function AllBooks() {
                 )
             ); // Set the book's availability to true (indicating it is now available)
 
-        // Update the borrowedBooks state to remove the returned book
-        setBorrowedBooks(prevBooks =>
-            prevBooks.filter(borrowedBook => borrowedBook.book_id !== bookId)
-        );
+            // Update the borrowedBooks state to remove the returned book
+            setBorrowedBooks(prevBooks =>
+                prevBooks.filter(borrowedBook => borrowedBook.book_id !== bookId)
+            );
 
-        // Also update filteredBooks if you are using it for displaying results
-        setFilteredBooks(prevBooks =>
-            prevBooks.map(book =>
-                book.id === bookId ? { ...book, availability_status: true } : book
-            )
-        );
-        
+            // Also update filteredBooks if you are using it for displaying results
+            setFilteredBooks(prevBooks =>
+                prevBooks.map(book =>
+                    book.id === bookId ? { ...book, availability_status: true } : book
+                )
+            );
+
         } catch (error) {
             setError('Error returning the book');
         }
@@ -134,9 +134,9 @@ export default function AllBooks() {
         try {
             // Send delete request to your backend
             await axios.delete(`http://localhost:3000/books/${bookId}`);
-        // Remove the deleted book from the UI state
-        setBooks((prevBooks) => prevBooks.filter(book => book.id !== bookId));
-        setFilteredBooks(prevBooks => prevBooks.filter(book => book.id !== bookId)); // Also update the filtered books state
+            // Remove the deleted book from the UI state
+            setBooks((prevBooks) => prevBooks.filter(book => book.id !== bookId));
+            setFilteredBooks(prevBooks => prevBooks.filter(book => book.id !== bookId)); // Also update the filtered books state
         } catch (error) {
             setError('Error deleting the book');
         }
@@ -148,19 +148,19 @@ export default function AllBooks() {
         // You could redirect to the update page here, if needed
     };
 
-        // Open modal with selected book data
-        const handleOpenModal = (book) => {
-            setSelectedBook(book);
-            setOpenModal(true);
-        };
-    
-        // Close modal
-        const handleCloseModal = () => {
-            setOpenModal(false);
-            setSelectedBook(null);
-        };
-    
-    
+    // Open modal with selected book data
+    const handleOpenModal = (book) => {
+        setSelectedBook(book);
+        setOpenModal(true);
+    };
+
+    // Close modal
+    const handleCloseModal = () => {
+        setOpenModal(false);
+        setSelectedBook(null);
+    };
+
+
 
     return (
         <div>
@@ -178,7 +178,7 @@ export default function AllBooks() {
             <Container>
                 <Box sx={{
                     display: 'flex',
-                    justifyContent: 'center',
+                    justifyContent: 'left',
                     alignItems: 'stretch',
                     flexWrap: 'wrap',
                     gap: 2,
@@ -186,129 +186,129 @@ export default function AllBooks() {
                 }}>
                     {filteredBooks.map((book) => (
                         <Card
-                            key={book.id}
-                            variant="outlined"
+                        key={book.id}
+                        variant="outlined"
+                        sx={{
+                            width: { xs: '100%', sm: '250px' },
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 1,  // Adjust gap for the new row-based layout
+                            padding: 2,
+                            minHeight: '200px',  // Ensure there's enough space for all rows
+                            boxSizing: 'border-box',
+                            borderRadius: 2,
+                            cursor: 'pointer',
+                        }}
+                        onClick={() => handleOpenModal(book)}
+                    >
+                        {/* Row 1: Book Title */}
+                        <Typography
+                            color="text.primary"
+                            fontWeight="semiBold"
                             sx={{
-
-                                width: { xs: '100%', sm: '250px' }, // Ensure a fixed width on smaller screens
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: 2,
-                                padding: 2,
-                                minHeight: '200px',             // Enforce minimum height for all cards
-                                boxSizing: 'border-box',        // Ensure padding does not affect card width
-                                borderRadius: 2,
-                                cursor: 'pointer',
+                                display: '-webkit-box',
+                                whiteSpace: 'normal',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                WebkitBoxOrient: 'vertical',
+                                WebkitLineClamp: 2, // Limit to 2 lines and add ellipsis if needed
+                                maxWidth: '150px',  // Adjust width to match layout
+                                textAlign: 'center',
                             }}
-                            onClick={() => handleOpenModal(book)} // Open modal on card click
                         >
-
-                            {/* <CardMedia
-                            component="img"
-                            width="100%"
-                            height="auto"
-                            alt="Contemplative Reptile album cover"
-                            src="/images/harry_potter_book_1.jpg"
-                            sx={{
-                                width: { xs: '100%', sm: 150 },
-                                borderRadius: 2
-                            }}
-                        /> */}
-                            <Stack direction="column" alignItems="center" spacing={1} useFlexGap>
-                                <div>
-                                    <Typography
-                                        color="text.primary"
-                                        fontWeight="semiBold"
+                            {book.title}
+                        </Typography>
+                    
+                    
+                        {/* Row 3: Author Name */}
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            fontWeight="medium"
+                            textAlign="center"
+                            sx={{ width: '100%', display: 'inline-block' }}
+                        >
+                            {book.author}
+                        </Typography>
+                    
+                        {/* Row 4: Buttons */}
+                        <Box sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1,  // Space between buttons
+                            marginTop: 'auto',  // Push buttons to the bottom
+                            width: '100%',
+                        }}>
+                            {/* Admin or Librarian */}
+                            {(isLibrarian || isAdmin) ? (
+                                <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
+                                    <Button
+                                        variant="outlined"
                                         sx={{
-                                            display: 'inline-block',
-                                            whiteSpace: 'wrap',
-                                            maxWidth: '150px'
-                                        }}>
-                                        {/* Harry Potter and the Philosopher's Stone */}
-                                        {book.title}
-                                    </Typography>
-                                    <Typography
-
-                                        variant="caption"
-                                        color="text.secondary"
-                                        fontWeight="medium"
-                                        textAlign="center"
-                                        sx={{ width: '100%', display: 'inline-block' }}
+                                            textTransform: 'none',
+                                            width: '48%',
+                                            height: '48px',  // Consistent height for the buttons
+                                        }}
+                                        component={Link}
+                                        to={`/update_book/${book.id}`}
+                                        onClick={(event) => handleUpdate(book.id, event)}
                                     >
-                                        {/* JK Rowling */}
-                                        {book.author}
-                                    </Typography>
-                                </div>
-                                <Box sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'flex-end',   // Ensures button is pushed to the bottom
-                                    marginTop: 'auto',            // Push button down to the bottom
-                                    width: '100%',
-                                }}>
-                                    {(isLibrarian || isAdmin) ? (
-                                        <Box sx={{ display: 'flex', gap: 1 }}>
-                                            <Button
-                                                variant="outlined"
-                                                sx={{
-                                                    textTransform: 'none',
-                                                    width: '48%',
-                                                }}
-                                                component={Link}
-                                                to={`/update_book/${book.id}`} // Link to the update page
-                                                onClick={(event) => handleUpdate(book.id, event)} // Prevent modal from opening
-                                            >
-                                                Update
-                                            </Button>
-                                            <Button
-                                                variant="outlined"
-                                                sx={{
-                                                    textTransform: 'none',
-                                                    width: '48%',
-                                                }}
-                                                onClick={(event) => handleDelete(book.id, event)} // Trigger delete function
-                                            >
-                                                Delete
-                                            </Button>
-                                        </Box>
-                                    ) : (
-                                        <>
-                                            {borrowedBooks.some(borrowedBook => borrowedBook.book_id === book.id && borrowedBook.returned_on === null) ? (
-                                                <Button
-                                                    variant="outlined"
-                                                    sx={{
-                                                        textTransform: 'none',
-                                                        width: '100%',
-                                                        backgroundColor: '#e7ffcd'
-                                                    }}
-                                                    onClick={(event) => handleReturn(book.id, event)} // Trigger return function
-                                                >
-                                                    Return
-                                                </Button>
-                                            ) : (
-                                                <Button
-                                                    disabled={book.availability_status === false}
-                                                    variant="outlined"
-                                                    sx={{
-                                                        textTransform: 'none',
-                                                        width: '100%',
-                                                    }}
-                                                    onClick={(event) => handleBorrow(book.id, event)} // Trigger borrow function
-                                                >
-                                                    {book.availability_status ? 'Borrow' : 'Unavailable'}
-                                                </Button>
-                                            )}
-                                        </>
-                                    )}
+                                        Update
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        sx={{
+                                            textTransform: 'none',
+                                            width: '48%',
+                                            height: '48px',  // Consistent height for the buttons
+                                        }}
+                                        onClick={(event) => handleDelete(book.id, event)}
+                                    >
+                                        Delete
+                                    </Button>
                                 </Box>
-                            </Stack>
-                        </Card>
+                            ) : (
+                                <>
+                                    {/* User-specific Buttons (Borrow or Return) */}
+                                    {borrowedBooks.some(borrowedBook => borrowedBook.book_id === book.id && borrowedBook.returned_on === null) ? (
+                                        <Button
+                                            variant="outlined"
+                                            sx={{
+                                                textTransform: 'none',
+                                                width: '100%',  // Full width for Return
+                                                height: '48px',  // Consistent height for the buttons
+                                                backgroundColor: '#e7ffcd',  // Styling for return button
+                                            }}
+                                            onClick={(event) => handleReturn(book.id, event)}
+                                        >
+                                            Return
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            disabled={book.availability_status === false}
+                                            variant="outlined"
+                                            sx={{
+                                                textTransform: 'none',
+                                                width: '100%',  // Full width for Borrow
+                                                height: '48px',  // Consistent height for the buttons
+                                            }}
+                                            onClick={(event) => handleBorrow(book.id, event)}
+                                        >
+                                            {book.availability_status ? 'Borrow' : 'Unavailable'}
+                                        </Button>
+                                    )}
+                                </>
+                            )}
+                        </Box>
+                    </Card>
+                    
+
                     ))}
                 </Box>
             </Container>
-                        {/* Modal for showing book details */}
-                        <Modal
+            {/* Modal for showing book details */}
+            <Modal
                 open={openModal}
                 onClose={handleCloseModal}
                 closeAfterTransition
