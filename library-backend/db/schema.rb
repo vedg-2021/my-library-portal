@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_29_181853) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_30_170542) do
   create_table "admins", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.string "email"
@@ -43,6 +43,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_181853) do
     t.datetime "updated_at", null: false
     t.boolean "request_is_approved", default: false
     t.boolean "return_is_approved", default: false
+    t.boolean "is_rejected", default: false
+    t.string "remark"
     t.index ["book_id"], name: "index_borrows_on_book_id"
     t.index ["user_id"], name: "index_borrows_on_user_id"
   end
