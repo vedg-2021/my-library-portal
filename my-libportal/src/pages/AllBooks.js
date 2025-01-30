@@ -90,22 +90,6 @@ export default function AllBooks() {
         }
     }, [userId]);
 
-    // Search books based on the query
-    // const handleSearch = (e) => {
-    //     const query = e.target.value.toLowerCase(); // Convert search query to lowercase
-    //     setSearchQuery(query);
-    //     if (query === '') {
-    //         setFilteredBooks(books); // If query is empty, show all books
-    //     } else {
-    //         const filtered = books.filter(book =>
-    //             book.title.toLowerCase().includes(query) ||
-    //             book.author.toLowerCase().includes(query) || book.genre.toLowerCase().includes(query)
-    //         );
-    //         setFilteredBooks(filtered); // Filter books based on title or author
-    //     }
-    // };
-
-
     // Handles the search when the button is clicked
     const handleSearch = () => {
         if (!searchQuery.trim()) {
@@ -187,7 +171,7 @@ export default function AllBooks() {
         // Immediately update the UI to show "Return Approval Pending"
         setBorrowedBooks(prevBooks => {
             const updatedBorrowedBooks = prevBooks.map(book =>
-                book.book_id === bookId
+                ((book.book_id === bookId) && (book.is_rejected === false))
                     ? { ...book, return_is_approved: false, returned_on: today }  // Mark as pending
                     : book
             );
@@ -251,6 +235,7 @@ export default function AllBooks() {
             <div>
                 <h1>Books</h1>
 
+
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <TextField
@@ -258,7 +243,10 @@ export default function AllBooks() {
                             variant="outlined"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            sx={{ width: '400px' }}
+                            sx={{ 
+                                flexGrow: 1, 
+                                width: { xs: '300px', sm: '400px', md: '500px' } 
+                            }}
                         />
                         {/* Search icon button */}
                         <IconButton
@@ -485,64 +473,6 @@ export default function AllBooks() {
 
                                                     </Box>
                                                     }
-                                                    {/* <Button
-                                                    disabled={book.availability_status === false}
-                                                    variant="outlined"
-                                                    sx={{
-                                                        textTransform: 'none',
-                                                        width: '100%',  // Full width for Borrow
-                                                        height: '48px',  // Consistent height for the buttons
-                                                    }}
-                                                    onClick={(event) => handleBorrow(book.id, event)}
-                                                >
-                                                    {book.availability_status ? 'Borrow' :
-                                                        <Box sx={{
-                                                            display: 'flex',
-                                                            flexDirection: 'column',
-                                                            gap: 1,  // Space between buttons
-                                                            marginTop: 'auto',  // Push buttons to the bottom
-                                                            width: '100%',
-                                                        }}>
-                                                            {book.availability_status ? null :
-                                                                (() => {
-                                                                    // Find the borrowed book entry
-                                                                    const borrowedBook = allBorrowedBooks.find(b => b.book_id === book.id && b.returned_on === null);
-
-                                                                    console.log("HELLO", borrowedBook)
-
-                                                                    let label = 'Available on: ';  // Default label if not borrowed
-
-                                                                    if (borrowedBook) {
-                                                                        // If borrowed, calculate the "Available on" date (7 days after borrowed_on)
-                                                                        const borrowedDate = new Date(borrowedBook.borrowed_on); // Convert borrowed_on to Date object
-                                                                        const availableDate = addDays(borrowedDate, 7); // Add 7 days
-                                                                        label = `Available on: ${format(availableDate, 'MMM dd, yyyy')}`; // Format and set the label
-                                                                    }
-
-                                                                    return (
-                                                                        <Chip
-                                                                            size="small"
-                                                                            variant="outlined"
-                                                                            icon={<InfoRoundedIcon />}
-                                                                            label={label}  // Use the precomputed label
-                                                                            sx={(theme) => {
-                                                                                const isDarkMode = theme.palette.mode === 'light';
-                                                                                return {
-                                                                                    marginTop: 'auto',
-                                                                                    '.MuiChip-icon': { fontSize: 16, ml: '4px', color: isDarkMode ? '#4caf50' : '#388e3c' },
-                                                                                    bgcolor: !isDarkMode ? '#2c6b29' : '#c8e6c9',
-                                                                                    borderColor: !isDarkMode ? '#1b5e20' : '#81c784',
-                                                                                    color: !isDarkMode ? '#c8e6c9' : '#2c6b29',
-                                                                                };
-                                                                            }}
-                                                                        />
-                                                                    );
-                                                                })()
-                                                            }
-
-                                                        </Box>
-                                                    }
-                                                </Button> */}
                                                 </>
                                             )))}
                                         </>
