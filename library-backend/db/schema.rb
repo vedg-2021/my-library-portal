@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_28_110529) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_29_181853) do
   create_table "admins", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.string "email"
@@ -41,6 +41,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_28_110529) do
     t.date "returned_on"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "request_is_approved", default: false
+    t.boolean "return_is_approved", default: false
     t.index ["book_id"], name: "index_borrows_on_book_id"
     t.index ["user_id"], name: "index_borrows_on_user_id"
   end
@@ -64,6 +66,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_28_110529) do
     t.string "phone"
     t.string "address"
     t.boolean "is_approved", default: false
+    t.boolean "is_deleted", default: false
   end
 
   add_foreign_key "borrows", "books"

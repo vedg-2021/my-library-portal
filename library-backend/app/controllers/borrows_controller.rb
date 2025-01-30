@@ -5,8 +5,13 @@ class BorrowsController < ApplicationController
         @borrow = Borrow.new(borrow_params)
         if @borrow.save
             # Update the book's availability_status to false after successful borrow
-            @borrow.book.update(availability_status: false)
-            render json: {message: "Borrowed!", borrow: @borrow, book: @borrow.book}, status: :created
+            # @borrow.book.update(availability_status: false)
+            if @borrow.book.availability_status && @borrow.book.current_quantity > 0
+                # @borrow.book.update(current_quantity: @borrow.book.current_quantity - 1)
+                render json: {message: "Request Generated!", borrow: @borrow, book: @borrow.book}, status: :created
+            else
+                render json: {message: "Book Unavailable!"}, status: :unprocessable_entity
+            end
         else
             render json: {errors: @borrow.errors.full_messages}, status: :unprocessable_entity
         end
@@ -33,7 +38,26 @@ class BorrowsController < ApplicationController
         
         if @user
             # Fetch borrowing history for the specific user
-            @borrows = Borrow.where(user_id: @user.id).includes(:book) # Assuming each borrow is associated with a book
+            # @borrows = Borrow.where.not(borrowed_on: nil).where.(user_id: @user.id).includes(:book) # Assuming each borrow is associated with a book
+
+            # Fetch old records where borrowed_on and returned_on are set, and approvals are true
+            old_records = Borrow.where(
+                user_id: @user.id,
+                request_is_approved: true,
+                return_is_approved: true
+            ).where.not(borrowed_on: nil, returned_on: nil)
+        
+            # Fetch pending records where borrowed_on is set, but returned_on is NULL and approvals are false
+            pending_records = Borrow.where(
+                user_id: @user.id,
+                returned_on: nil,
+                request_is_approved: true,
+                return_is_approved: false
+            ).where.not(borrowed_on: nil)
+
+            # Combine both sets of records
+            @borrows = old_records.or(pending_records).includes(:book)
+        
             
             # Log the borrowing history for debugging purposes
             logger.debug "User ID: #{@user.id}, Borrowing History: #{@borrows.inspect}"
@@ -51,11 +75,12 @@ class BorrowsController < ApplicationController
 
     def return_book
         # Return the borrowed book and also update the book's availability_status to true
-        borrow = Borrow.find_by(book_id: params[:book_id], user_id: params[:user_id], returned_on: nil)
-        if borrow
-            borrow.update(returned_on: Date.today)
-            borrow.book.update(availability_status: true)
-            render json: {message: "Book returned successfully", borrow: borrow}, status: :ok
+        @borrow = Borrow.find_by(book_id: params[:book_id], user_id: params[:user_id], returned_on: nil)
+        if @borrow
+            @borrow.update(returned_on: Date.today)
+            # @borrow.book.update(availability_status: true)
+            # @borrow.book.update(current_quantity: @borrow.book.current_quantity + 1)
+            render json: {message: "Return Request Createad!", borrow: @borrow}, status: :ok
         else
             render json: {error: "Book not found"}, status: :not_found
         end
@@ -67,11 +92,61 @@ class BorrowsController < ApplicationController
             render json: @all, status: :ok
         end
     end
+    
+    def showpending
+        @all = Borrow.where(request_is_approved: false)
+        if @all
+            render json: @all, include: [:book, :user], status: :ok
+        end
+    end
+
+    def showpendingreturns
+        @all = Borrow.where.not(returned_on: nil).where(return_is_approved: false)
+        if @all
+            render json: @all, include: [:book, :user], status: :ok
+        end
+    end
+
+    def approveborrow
+        logger.debug "Params: #{borrow_params.inspect}"
+
+        @borrow = Borrow.find_by(id: params[:recordid])
+        if @borrow
+            # Update the book's availability_status to false after successful borrow
+            # @borrow.book.update(availability_status: false)
+            if @borrow.book.availability_status 
+                @borrow.book.update(current_quantity: @borrow.book.current_quantity - 1)
+                @borrow.update(request_is_approved: true, borrowed_on: Date.today)
+            end
+
+            if @borrow.book.current_quantity == 0
+                @borrow.book.update(availability_status: false)
+            end
+
+            render json: {message: "Borrow Approved!", borrow: @borrow, book: @borrow.book}, status: :created
+        else
+            render json: {errors: @borrow.errors.full_messages}, status: :unprocessable_entity
+        end
+    end
+
+    def approvereturn
+        logger.debug "Params: #{borrow_params.inspect}"
+
+        @borrow = Borrow.find_by(id: params[:recordid])
+        if @borrow
+            @borrow.update(returned_on: Date.today, return_is_approved: true)
+            @borrow.book.update(availability_status: true)
+            @borrow.book.update(current_quantity: @borrow.book.current_quantity + 1)
+            render json: {message: "Book returned successfully", borrow: @borrow}, status: :ok
+        else
+            render json: {error: "Book not found"}, status: :not_found
+        end
+    end
 
     private
 
     
     def borrow_params
-        params.require(:borrow).permit(:book_id, :user_id, :borrowed_on, :returned_on)
+        params.require(:borrow).permit(:recordid, :book_id, :user_id, :borrowed_on, :returned_on, :request_is_approved)
     end
 end

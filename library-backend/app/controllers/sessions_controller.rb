@@ -4,12 +4,18 @@ class SessionsController < ApplicationController
         if user_params[:type] === "user"
             @user = User.find_by(email: user_params[:email]);
             if @user
-                if @user.is_approved == false
+                if @user.is_deleted && !(@user.is_approved)
+                    render json: { message: 'Your Application was rejected. Please contact Librarian!'}, status: :unauthorized
+                elsif !(@user.is_approved) && @user.authenticate(user_params[:password])
                     render json: {message: 'Your application is under reivew. Please Try again later.'}, status: :forbidden
+                elsif @user.is_deleted && @user.authenticate(user_params[:password])
+                    render json: {message: 'Your profile was deleted.'}, status: :forbidden
                 elsif @user.authenticate(user_params[:password])
                     secret_key = Rails.application.credentials.secret_key_base
                     token = JWT.encode({user_id: @user.id, exp: 24.hours.from_now.to_i}, secret_key, 'HS256')
                     render json: { message: 'Login successful', token: token, user: @user }, status: :ok
+                else
+                    render json: {message: 'Invalid email or password'}, status: :unauthorized
                 end
             else
                 render json: {message: 'Invalid email or password'}, status: :unauthorized

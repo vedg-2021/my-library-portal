@@ -6,7 +6,7 @@ class BooksController < ApplicationController
     def create
         @book = Book.new(book_params)
         if @book.save
-            render json: {message: "Book Added!", book: @book}, status: :created
+            render json: {message: "Book Added Successfully!", book: @book}, status: :created
         else
             render json: {erros: @book.errors.full_messages}, status: :unprocessable_entity
         end
@@ -48,6 +48,6 @@ class BooksController < ApplicationController
 
 
     def book_params
-        params.require(:book).permit(:title, :author, :publication_date, :genre, :availability_status)
+        params.require(:book).permit(:title, :author, :publication_date, :genre, :availability_status, :current_quantity, :total_quantity, :isbn, :price)
     end
 end
