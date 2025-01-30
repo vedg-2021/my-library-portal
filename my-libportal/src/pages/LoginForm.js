@@ -1,5 +1,5 @@
-import React, { useState, useContext} from 'react';
-import { TextField, Button, Container, Box, Typography, Grid, Alert } from '@mui/material';
+import React, { useState, useContext } from 'react';
+import { TextField, Button, Container, Box, Typography, Grid, Alert, Snackbar } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from './AuthContext';
@@ -12,6 +12,7 @@ function LoginForm({ userType = "user", loginUrl = "/login", dashboardUrl = "/us
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
   const { setIsAuthenticated } = useContext(AuthContext);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
 
   // Handle form submission
@@ -30,115 +31,119 @@ function LoginForm({ userType = "user", loginUrl = "/login", dashboardUrl = "/us
       // If login is successful, store the JWT token and user info in localStorage
       localStorage.setItem('token', response.data.token);
       userType === "librarian" ? localStorage.setItem('librarian', JSON.stringify(response.data.librarian)) : userType === "user" ? localStorage.setItem('user', JSON.stringify(response.data.user)) : localStorage.setItem('admin', JSON.stringify(response.data.admin));
-      console.log(response.data.user);
-      // Update the authentication state
+      console.log("yyyyyyyyyyyyyyyy",response);
       setIsAuthenticated(true);
       navigate('/');
-      // Display success message
       setError('');
       setSuccess(response.data.message);
-      
+
 
     } catch (error) {
       console.log("error hai yeh", error);
       setSuccess('');
-      // If there are errors, display them
       setError(error.response.data.message);
     }
+
+    setOpenSnackbar(true);
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          mt: 8,
-          padding: 3,
-          border: '1px solid #ccc',
-          borderRadius: 2,
-          boxShadow: 2,
-        }}
-      >
-        <Typography variant="h5" gutterBottom>
-          {userType === "librarian" ? "Librarian Log In" : userType === "user" ? "User Log In" : "Admin Log In"}
-        </Typography>
+    <>
+      <Container component="main" maxWidth="xs">
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            mt: 8,
+            padding: 3,
+            border: '1px solid #ccc',
+            borderRadius: 2,
+            boxShadow: 2,
+          }}
+        >
+          <Typography variant="h5" gutterBottom>
+            {userType === "librarian" ? "Librarian Log In" : userType === "user" ? "User Log In" : "Admin Log In"}
+          </Typography>
 
-        {/* Display error message */}
-        {error && (
-          <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+          <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+            {/* Email Input */}
+            <TextField
+              variant="outlined"
+              label="Email Address"
+              fullWidth
+              required
+              margin="normal"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoFocus
+            />
 
-        {/* Display success message */}
-        {success && (
-          <Alert severity="success" sx={{ width: '100%', mb: 2 }}>
-            {success}
-          </Alert>
-        )}
+            {/* Password Input */}
+            <TextField
+              variant="outlined"
+              label="Password"
+              fullWidth
+              required
+              margin="normal"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
-        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-          {/* Email Input */}
-          <TextField
-            variant="outlined"
-            label="Email Address"
-            fullWidth
-            required
-            margin="normal"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoFocus
-          />
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Log In
+            </Button>
 
-          {/* Password Input */}
-          <TextField
-            variant="outlined"
-            label="Password"
-            fullWidth
-            required
-            margin="normal"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Log In
-          </Button>
-
-          {/* Optional: Link to the other login page */}
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              {userType === "librarian" ? (
-                <Button 
-                  component={Link}
-                  to="/login"
-                  color="inherit">
-                  Regular User? Log In Here
-                </Button>
-              ) : userType === "user" ? (
-                <Button 
-                  component={Link}
-                  to="/signup"
-                  color="inherit">
-                  Don't have an account? Sign Up
-                </Button>
-              ) : (null)}
+            {/* Optional: Link to the other login page */}
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                {userType === "librarian" ? (
+                  <Button
+                    component={Link}
+                    to="/login"
+                    color="inherit">
+                    Regular User? Log In Here
+                  </Button>
+                ) : userType === "user" ? (
+                  <Button
+                    component={Link}
+                    to="/signup"
+                    color="inherit">
+                    Don't have an account? Sign Up
+                  </Button>
+                ) : (null)}
+              </Grid>
             </Grid>
-          </Grid>
-        </form>
-      </Box>
-    </Container>
+          </form>
+        </Box>
+      </Container>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000} 
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        sx={{marginTop: '50px'}}
+      >
+        <Alert
+          onClose={() => setOpenSnackbar(false)}
+          severity={error ? 'error' : 'success'}
+          sx={{ width: '100%' }}
+        >
+          {error || success}
+        </Alert>
+      </Snackbar>
+
+    </>
   );
 }
 
