@@ -20,6 +20,8 @@ import Admin from './pages/Admin';
 import LibrarianTable from './pages/LibrarianTable';
 import UpdateLibrarian from './pages/UpdateLibrarian';
 import ApproveUsers from './pages/ApproveUsers';
+import PendingRequests from './pages/PendingRequests';
+import PendingReturnRequests from './pages/PendingReturnRequests';
 
 function App() {
 
@@ -45,6 +47,8 @@ function App() {
         <Route exact path="/all_librarian" element={<LibrarianTable />} /> {/* All Librarians Table */}
         <Route exact path="/update_librarian/:id" element={<UpdateLibrarian />} /> {/* Update Profile details of librarian */}
         <Route exact path="/unapproved_users" element={<ApproveUsers />} /> {/* Approve user available to librarian and admin */}
+        <Route exact path="/pending_requests" element={<PendingRequests />} />
+        <Route exact path="/pending_return_requests" element={<PendingReturnRequests />} />
       </Routes>
     </Router>
     </div>
