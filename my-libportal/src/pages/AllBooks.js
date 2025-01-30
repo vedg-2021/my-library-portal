@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Card, CardMedia, Stack, Typography, IconButton, Box, Container, Button, Modal, Backdrop, Fade, TextField, Chip, Snackbar, Alert, RadioGroup, Radio, FormControlLabel } from '@mui/material';
+import { Card, CardMedia, Stack, Typography, IconButton, Box, Container, Button, Modal, Backdrop, Fade, TextField, Chip, Snackbar, Alert, RadioGroup, Radio, FormControlLabel, Pagination } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search'
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
@@ -26,8 +26,14 @@ export default function AllBooks() {
     const [searchResultMessage, setSearchResultMessage] = useState('');
     const [searchFilter, setSearchFilter] = useState('all'); // Default filter is 'author'
     const navigate = useNavigate();
+    // State for pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const booksPerPage = 16;
 
-
+    // Calculate indexes for slicing books
+    const startIndex = (currentPage - 1) * booksPerPage;
+    const endIndex = startIndex + booksPerPage;
+    const displayedBooks = filteredBooks.slice(startIndex, endIndex);
 
 
     // Fetch books data from the backend
@@ -228,7 +234,10 @@ export default function AllBooks() {
         setSelectedBook(null);
     };
 
-
+    // Handle page change
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
+    };
 
     return (
         <>
@@ -243,9 +252,9 @@ export default function AllBooks() {
                             variant="outlined"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            sx={{ 
-                                flexGrow: 1, 
-                                width: { xs: '300px', sm: '400px', md: '500px' } 
+                            sx={{
+                                flexGrow: 1,
+                                width: { xs: '300px', sm: '400px', md: '500px' }
                             }}
                         />
                         {/* Search icon button */}
@@ -263,9 +272,20 @@ export default function AllBooks() {
                         value={searchFilter}
                         onChange={(e) => setSearchFilter(e.target.value)}
                     >
-                        <FormControlLabel value="all" control={<Radio />} label="All" />
-                        <FormControlLabel value="author" control={<Radio />} label="Author" />
-                        <FormControlLabel value="genre" control={<Radio />} label="Genre" />
+                        <FormControlLabel
+                            control={<Radio sx={{
+                                color: 'black', // Default color
+                                '&.Mui-checked': { color: '#6404eb' } // Color when selected
+                            }} />}
+                            value="all" label="All" />
+                        <FormControlLabel value="author" control={<Radio sx={{
+                            color: 'black', // Default color
+                            '&.Mui-checked': { color: '#6404eb' } // Color when selected
+                        }} />} label="Author" />
+                        <FormControlLabel value="genre" control={<Radio sx={{
+                            color: 'black', // Default color
+                            '&.Mui-checked': { color: '#6404eb' } // Color when selected
+                        }} />} label="Genre" />
                     </RadioGroup>
 
 
@@ -286,7 +306,7 @@ export default function AllBooks() {
                         gap: 2,
                         padding: 2,
                     }}>
-                        {filteredBooks.map((book) => (
+                        {displayedBooks.map((book) => (
                             <Card
                                 key={book.id}
                                 variant="outlined"
@@ -443,30 +463,30 @@ export default function AllBooks() {
                                                                 }
 
                                                                 return (
-                                                                        <Chip
-                                                                            size="small"
-                                                                            variant="outlined"
-                                                                            icon={<InfoRoundedIcon />}
-                                                                            label={label}  // Use the precomputed label
-                                                                            sx={(theme) => {
-                                                                                const isDarkMode = theme.palette.mode === 'light';
-                                                                                return {
-                                                                                    display: 'flex',
-                                                                                    // alignItems: 'center',  // Ensures text is centered vertically
-                                                                                    justifyContent: 'center',  // Centers content horizontally
-                                                                                    fontSize: '0.875rem',  // Matches button text size
-                                                                                    padding: '6px 8px',  // Keeps chip compact
-                                                                                    height: '32px',  // Keeps the default small chip height
-                                                                                    lineHeight: '32px',  // Aligns text properly
-                                                                                    verticalAlign: 'middle',  // Helps with alignment in flex containers
-                                                                                                                                                            // marginTop: 'auto',
-                                                                                    '.MuiChip-icon': { fontSize: 16, ml: '4px', color: isDarkMode ? '#4caf50' : '#388e3c' },
-                                                                                    bgcolor: !isDarkMode ? '#2c6b29' : '#c8e6c9',
-                                                                                    borderColor: !isDarkMode ? '#1b5e20' : '#81c784',
-                                                                                    color: !isDarkMode ? '#c8e6c9' : '#2c6b29',
-                                                                                };
-                                                                            }}
-                                                                        />
+                                                                    <Chip
+                                                                        size="small"
+                                                                        variant="outlined"
+                                                                        icon={<InfoRoundedIcon />}
+                                                                        label={label}  // Use the precomputed label
+                                                                        sx={(theme) => {
+                                                                            const isDarkMode = theme.palette.mode === 'light';
+                                                                            return {
+                                                                                display: 'flex',
+                                                                                // alignItems: 'center',  // Ensures text is centered vertically
+                                                                                justifyContent: 'center',  // Centers content horizontally
+                                                                                fontSize: '0.875rem',  // Matches button text size
+                                                                                padding: '6px 8px',  // Keeps chip compact
+                                                                                height: '32px',  // Keeps the default small chip height
+                                                                                lineHeight: '32px',  // Aligns text properly
+                                                                                verticalAlign: 'middle',  // Helps with alignment in flex containers
+                                                                                // marginTop: 'auto',
+                                                                                '.MuiChip-icon': { fontSize: 16, ml: '4px', color: isDarkMode ? '#4caf50' : '#388e3c' },
+                                                                                bgcolor: !isDarkMode ? '#2c6b29' : '#c8e6c9',
+                                                                                borderColor: !isDarkMode ? '#1b5e20' : '#81c784',
+                                                                                color: !isDarkMode ? '#c8e6c9' : '#2c6b29',
+                                                                            };
+                                                                        }}
+                                                                    />
                                                                 );
                                                             })()
                                                         }
@@ -482,6 +502,20 @@ export default function AllBooks() {
 
 
                         ))}
+                    </Box>
+                    {/* Pagination Component */}
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                        <Pagination
+                            count={Math.ceil(filteredBooks.length / booksPerPage)}
+                            page={currentPage}
+                            onChange={handlePageChange}
+                            color="primary"
+                            sx={{
+                                '& .MuiPaginationItem-root': { color: 'black' }, // Change page number color
+                                '& .Mui-selected': { backgroundColor: '#6404eb', color: 'white' }, // Selected page styling
+                                '& .MuiPaginationItem-root:hover': { backgroundColor: '#ddd' } // Hover effect                    
+                            }}
+                        />
                     </Box>
                 </Container>
                 {/* Modal for showing book details */}
