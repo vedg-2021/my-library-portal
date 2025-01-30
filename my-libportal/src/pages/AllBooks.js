@@ -347,51 +347,6 @@ export default function AllBooks() {
                                 </Typography>
 
                                 {localStorage.getItem('librarian') ? `current: ${book.current_quantity}` :
-                                    // <Box sx={{
-                                    //     display: 'flex',
-                                    //     flexDirection: 'column',
-                                    //     gap: 1,  // Space between buttons
-                                    //     marginTop: 'auto',  // Push buttons to the bottom
-                                    //     width: '100%',
-                                    // }}>
-                                    //     {book.availability_status ? null :
-                                    //         (() => {
-                                    //             // Find the borrowed book entry
-                                    //             const borrowedBook = allBorrowedBooks.find(b => b.book_id === book.id && b.returned_on === null);
-
-                                    //             console.log("HELLO", borrowedBook)
-
-                                    //             let label = 'Available on: ';  // Default label if not borrowed
-
-                                    //             if (borrowedBook) {
-                                    //                 // If borrowed, calculate the "Available on" date (7 days after borrowed_on)
-                                    //                 const borrowedDate = new Date(borrowedBook.borrowed_on); // Convert borrowed_on to Date object
-                                    //                 const availableDate = addDays(borrowedDate, 7); // Add 7 days
-                                    //                 label = `Available on: ${format(availableDate, 'MMM dd, yyyy')}`; // Format and set the label
-                                    //             }
-
-                                    //             return (
-                                    //                 <Chip
-                                    //                     size="small"
-                                    //                     variant="outlined"
-                                    //                     icon={<InfoRoundedIcon />}
-                                    //                     label={label}  // Use the precomputed label
-                                    //                     sx={(theme) => {
-                                    //                         const isDarkMode = theme.palette.mode === 'light';
-                                    //                         return {
-                                    //                             marginTop: 'auto',
-                                    //                             '.MuiChip-icon': { fontSize: 16, ml: '4px', color: isDarkMode ? '#4caf50' : '#388e3c' },
-                                    //                             bgcolor: !isDarkMode ? '#2c6b29' : '#c8e6c9',
-                                    //                             borderColor: !isDarkMode ? '#1b5e20' : '#81c784',
-                                    //                             color: !isDarkMode ? '#c8e6c9' : '#2c6b29',
-                                    //                         };
-                                    //                     }}
-                                    //                 />
-                                    //             );
-                                    //         })()
-                                    //     }
-
-                                    // </Box>
                                     null
                                 }
 
@@ -475,7 +430,10 @@ export default function AllBooks() {
                                                         Borrow
                                                     </Button> : <Box sx={{
                                                         display: 'flex',
-                                                        flexDirection: 'column',
+                                                        // flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        height: '48px',
                                                         gap: 1,  // Space between buttons
                                                         marginTop: 'auto',  // Push buttons to the bottom
                                                         width: '100%',
@@ -497,22 +455,30 @@ export default function AllBooks() {
                                                                 }
 
                                                                 return (
-                                                                    <Chip
-                                                                        size="small"
-                                                                        variant="outlined"
-                                                                        icon={<InfoRoundedIcon />}
-                                                                        label={label}  // Use the precomputed label
-                                                                        sx={(theme) => {
-                                                                            const isDarkMode = theme.palette.mode === 'light';
-                                                                            return {
-                                                                                marginTop: 'auto',
-                                                                                '.MuiChip-icon': { fontSize: 16, ml: '4px', color: isDarkMode ? '#4caf50' : '#388e3c' },
-                                                                                bgcolor: !isDarkMode ? '#2c6b29' : '#c8e6c9',
-                                                                                borderColor: !isDarkMode ? '#1b5e20' : '#81c784',
-                                                                                color: !isDarkMode ? '#c8e6c9' : '#2c6b29',
-                                                                            };
-                                                                        }}
-                                                                    />
+                                                                        <Chip
+                                                                            size="small"
+                                                                            variant="outlined"
+                                                                            icon={<InfoRoundedIcon />}
+                                                                            label={label}  // Use the precomputed label
+                                                                            sx={(theme) => {
+                                                                                const isDarkMode = theme.palette.mode === 'light';
+                                                                                return {
+                                                                                    display: 'flex',
+                                                                                    // alignItems: 'center',  // Ensures text is centered vertically
+                                                                                    justifyContent: 'center',  // Centers content horizontally
+                                                                                    fontSize: '0.875rem',  // Matches button text size
+                                                                                    padding: '6px 8px',  // Keeps chip compact
+                                                                                    height: '32px',  // Keeps the default small chip height
+                                                                                    lineHeight: '32px',  // Aligns text properly
+                                                                                    verticalAlign: 'middle',  // Helps with alignment in flex containers
+                                                                                                                                                            // marginTop: 'auto',
+                                                                                    '.MuiChip-icon': { fontSize: 16, ml: '4px', color: isDarkMode ? '#4caf50' : '#388e3c' },
+                                                                                    bgcolor: !isDarkMode ? '#2c6b29' : '#c8e6c9',
+                                                                                    borderColor: !isDarkMode ? '#1b5e20' : '#81c784',
+                                                                                    color: !isDarkMode ? '#c8e6c9' : '#2c6b29',
+                                                                                };
+                                                                            }}
+                                                                        />
                                                                 );
                                                             })()
                                                         }
