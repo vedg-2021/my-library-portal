@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TextField, Button, Container, Box, Typography, FormControl, FormHelperText, InputLabel, Select, MenuItem } from '@mui/material';
+import { TextField, Button, Container, Box, Typography, FormControl, FormHelperText, InputLabel, Select, MenuItem, Snackbar, Alert } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 
 export default function UpdateUser() {
@@ -14,7 +14,9 @@ export default function UpdateUser() {
         password: '',  // default to true (available)
     });
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const [phoneError, setPhoneError] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState(false);
 
 
     useEffect(() => {
@@ -61,21 +63,28 @@ export default function UpdateUser() {
         try {
             const response = await axios.put(`http://localhost:3000/update_user/${id}`, user);  // PUT request to update the book
             localStorage.setItem('user', JSON.stringify(response.data));  // Assuming the response has the updated user object
-            navigate('/');  // Redirect to the main page after update
+            setError('');
+            setSuccess('Details Updated Successfully!');
+            setOpenSnackbar(true);
+            // Wait for 3 seconds before navigating
+            setTimeout(() => {
+                navigate('/');  // Redirect to the main page after update
+            }, 2000);
         } catch (error) {
-            setError('Error updating the book');
+            setSuccess('');
+            setError(error.response.data.error);
+            setOpenSnackbar(true);
+            console.log("here's your error ",error);
         }
     };
 
     return (
+        <>
         <Container>
             <Box sx={{ maxWidth: 600, margin: 'auto', padding: 3 }}>
                 <Typography variant="h4" gutterBottom>
                     Update User Details
                 </Typography>
-
-                {error && <Typography color="error">{error}</Typography>}
-
                 <form onSubmit={handleSubmit}>
                     <TextField
                         label="Name"
@@ -140,5 +149,22 @@ export default function UpdateUser() {
                 </form>
             </Box>
         </Container>
+        
+        <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000} 
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        sx={{marginTop: '50px'}}
+      >
+        <Alert
+          onClose={() => setOpenSnackbar(false)}
+          severity={error ? 'error' : 'success'}
+          sx={{ width: '100%' }}
+        >
+          {error || success}
+        </Alert>
+      </Snackbar>
+        </>
     );
 }

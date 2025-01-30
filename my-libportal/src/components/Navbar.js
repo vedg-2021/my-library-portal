@@ -72,6 +72,9 @@ function NavBar() {
             <>
               <Button color="inherit" component={Link} to="/addbook" onClick={handleButtonClick}>Add Book</Button>
               <Button color="inherit" component={Link} to="/users" onClick={handleButtonClick}>Users</Button>
+              <Button color="inherit" component={Link} to="/pending_requests" onClick={handleButtonClick}>Borrows</Button>
+              <Button color="inherit" component={Link} to="/pending_return_requests" onClick={handleButtonClick}>Returns</Button>
+              <Button color="inherit" component={Link} to="/unapproved_users" onClick={handleButtonClick}>Approvals</Button>
             </>
           )}
           {localStorage.getItem('admin') && (
