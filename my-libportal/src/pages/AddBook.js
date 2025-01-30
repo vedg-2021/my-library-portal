@@ -124,19 +124,6 @@ function AddBook() {
             Add New Book
           </Typography>
 
-          {/* Display error message */}
-          {/* {error && (
-          <Typography variant="body2" color="error" sx={{ width: '100%', mb: 2 }}>
-            {error}
-          </Typography>
-        )}
-
-        {open && success && (
-          <Alert severity="success" sx={{ width: '100%', mb: 2 }}>
-            {success}
-          </Alert>
-        )} */}
-
           <form onSubmit={handleSubmit} style={{ width: '100%' }}>
             {/* Title Input */}
             <TextField
@@ -212,6 +199,8 @@ function AddBook() {
                 <MenuItem value="Biography">Biography</MenuItem>
                 <MenuItem value="Fantasy">Fantasy</MenuItem>
                 <MenuItem value="Mystery">Mystery</MenuItem>
+                <MenuItem value="Dystopian">Dystopian</MenuItem>
+                <MenuItem value="Romance">Romance</MenuItem>
               </Select>
               <FormHelperText>Choose a genre</FormHelperText>
             </FormControl>

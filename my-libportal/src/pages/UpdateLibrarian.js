@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TextField, Button, Container, Box, Typography, FormControl, FormHelperText, InputLabel, Select, MenuItem } from '@mui/material';
+import { TextField, Button, Container, Box, Typography, FormControl, FormHelperText, InputLabel, Select, MenuItem, Snackbar, Alert } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 
 export default function UpdateLibrarian() {
@@ -15,6 +15,9 @@ export default function UpdateLibrarian() {
     });
     const [error, setError] = useState('');
     const [phoneError, setPhoneError] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [success, setSuccess] = useState(setSuccess);
+
 
     if(!(localStorage.getItem('librarian'))) navigate('/');
 
@@ -63,20 +66,23 @@ export default function UpdateLibrarian() {
         try {
             const response = await axios.put(`http://localhost:3000/update_librarian/${id}`, librarian);  // PUT request to update the book
             localStorage.setItem('librarian', JSON.stringify(response.data));  // Assuming the response has the updated librarian object
-            navigate('/');  // Redirect to the main page after update
+            setError('');
+            setSuccess("Librarian Details Updated Successfully");
+            setOpenSnackbar(true);
+            setTimeout(() => {navigate('/');}, 2000);
         } catch (error) {
-            setError('Error updating the book');
+            setError('Error updating Librarian Details');
         }
     };
 
     return (
+        <>
         <Container>
             <Box sx={{ maxWidth: 600, margin: 'auto', padding: 3 }}>
                 <Typography variant="h4" gutterBottom>
                     Update Librarian Details
                 </Typography>
 
-                {error && <Typography color="error">{error}</Typography>}
 
                 <form onSubmit={handleSubmit}>
                     <TextField
@@ -142,5 +148,21 @@ export default function UpdateLibrarian() {
                 </form>
             </Box>
         </Container>
+
+        <Snackbar
+            open={openSnackbar}
+            autoHideDuration={3000}
+            onClose={() => setOpenSnackbar(false)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center'}}
+            >
+                <Alert
+                    onClose={() => setOpenSnackbar(false)}
+                    severity={error ? 'error' : success}
+                    sx={{ width: '100%' }}
+                    >
+                        { error || success }
+                    </Alert>
+            </Snackbar>
+        </>
     );
 }

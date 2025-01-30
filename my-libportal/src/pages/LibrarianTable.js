@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Typography, Alert, Button, Fab } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Typography, Alert, Button, Fab, Snackbar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';  // Import the Add icon
 
@@ -13,6 +13,8 @@ function LibrarianTable() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate(); // Use history hook for navigation
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
 
   // Check if the user is librarian or admin; if not, redirect to home
   useEffect(() => {
@@ -32,7 +34,9 @@ function LibrarianTable() {
         console.log(response.data);
         setLoading(false);         // Stop loading
       } catch (error) {
+        setSuccess('');
         setError('Error fetching users');
+        setOpenSnackbar(true);
         setLoading(false);
       }
     };
@@ -48,9 +52,13 @@ function LibrarianTable() {
       await axios.delete(`http://localhost:3000/delete_librarian/${id}`);
       // Remove the deleted user from the UI state
       setLibs(libs.filter(user => user.id !== id));
+      setError('');
       setSuccess('Librarian deleted successfully');
+      setOpenSnackbar(true);
     } catch (error) {
+      setSuccess('');
       setError('Error deleting user');
+      setOpenSnackbar(true);
     }
   };
 
@@ -61,6 +69,7 @@ function LibrarianTable() {
 
 
   return (
+    <>
     <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>
         Librarians List
@@ -134,6 +143,23 @@ function LibrarianTable() {
         <AddIcon />
       </Fab>
     </Container>
+
+    <Snackbar 
+      open={openSnackbar}
+      autoHideDuration={3000}
+      onClose={() => setOpenSnackbar(false)}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+    >
+      <Alert
+        onClose={() => setOpenSnackbar(false)}
+        severity={error ? 'error' : 'success'}
+        sx={{ width: '100%'}}
+        >
+          {error || success}
+        </Alert>
+    </Snackbar>
+
+    </>
   );
 }
 

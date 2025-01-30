@@ -45,7 +45,7 @@ function UsersTable() {
   return (
     <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Users List
+        Borrowing History
       </Typography>
 
       {/* Display error message */}

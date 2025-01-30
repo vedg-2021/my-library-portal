@@ -39,9 +39,9 @@ function App() {
         <Route exact path="/users" element={<UsersTable />} /> {/* list of users */}
         <Route exact path="/add_librarian" element={<SignUp userType="admin" />} /> {/* Add librarian available to admin */}
         <Route exact path="/update_book/:id" element={<UpdateBook />} /> {/* Update a book available to librarian and admin*/}
-        <Route exact path="/borrowing_history" element={<BorrowsTable />} /> {/* borrowing history table */}
-        <Route exact path="/borrowing_history/user/:userId" element={<BorrowingHistory />} /> {/* Borrowing history of a user (what librarian and admin sees) */}
-        <Route exact path="/borrowing_history/:userId" element={<BorrowingHistory />} /> {/* Borrowing history of user (what user sees) */}
+        <Route exact path="/borrowing_history" element={<BorrowsTable />} /> {/* complete borrowing history table */}
+        <Route exact path="/borrowing_history/user/:userId" element={<BorrowingHistory />} /> {/* Borrowing history of user (what user sees) */}
+        <Route exact path="/borrowing_history/:userId" element={<BorrowingHistory />} />  {/* Borrowing history of a user (what librarian and admin sees) */}
         <Route exact path="/update_user/:id" element={<UpdateUser />} /> {/* Update details of user */}
         <Route exact path="/admin" element={<Admin />} /> {/* login for admin */}
         <Route exact path="/all_librarian" element={<LibrarianTable />} /> {/* All Librarians Table */}
