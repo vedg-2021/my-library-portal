@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   
       if @user.save # @user.save tries to save what data we've to 
         # Send a response back with the user data (excluding the password)
-        render json: { message: 'Sign Up Successfull.\nYou are being redirected to Login page.', user: @user }, status: :created
+        render json: { message: 'Sign Up Successfull. You are being redirected to Login page.', user: @user }, status: :created
       else
         # Return validation errors if user creation fails
         render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
@@ -14,18 +14,11 @@ class UsersController < ApplicationController
 
     # GET /users
     def index
-        @users = User.all
+        @users = User.where(is_approved: true, is_deleted: false)
         render json: @users
     end
 
     def destroy
-      # @user = User.find_by(id: params[:id])
-      # if @user
-      #   @user.destroy
-      #   render json: { message: "User deleted successfully" }, status: :ok
-      # else
-      #   render json: { error: "User not found" }, status: :not_found
-      # end
 
       @user = User.find_by(id: params[:id])
 
@@ -35,8 +28,8 @@ class UsersController < ApplicationController
           render json: { error: "User has borrowed books that haven't been returned and cannot be deleted" }, status: :unprocessable_entity
         else
           # Proceed with deletion if no borrow records with 'returned_on' is null
-          @user.destroy
-          render json: { message: "User deleted successfully" }, status: :ok
+          @user.update(is_deleted: true)
+          render json: { message: "User deleted successfully", user: @user}, status: :ok
         end
       else
         render json: { error: "User not found" }, status: :not_found
@@ -45,13 +38,23 @@ class UsersController < ApplicationController
 
     def update
       @user = User.find_by(id: params[:id])
+    
       if @user
-        @user.update(user_params)
-        render json: @user, status: :ok
+        # Check if the new email is already taken by another user
+        if user_params[:email].present? && User.exists?(email: user_params[:email]) && user_params[:email] != @user.email
+          render json: { error: "Email is already taken by another user." }, status: :unprocessable_entity
+        else
+          if @user.update(user_params)
+            render json: @user, status: :ok
+          else
+            render json: { error: @user.errors.full_messages }, status: :unprocessable_entity
+          end
+        end
       else
         render json: { error: "User not found" }, status: :not_found
       end
     end
+    
 
     def show
       @user = User.find_by(id: params[:id])
@@ -63,7 +66,7 @@ class UsersController < ApplicationController
     end
 
     def listunapproved
-      @user = User.where(is_approved: false)
+      @user = User.where(is_approved: false, is_deleted: false)
       if @user
         render json: { message: "Pending approval list fetched", users: @user }, status: :ok
       else
