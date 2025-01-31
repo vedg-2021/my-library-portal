@@ -16,7 +16,15 @@ function UsersTable() {
     const fetchBorrows = async () => {
       try {
         const response = await axios.get('http://localhost:3000/borrowing_history');
-        setBorrows(response.data);  // Save users data to users state we defined above
+
+        const sortedHistory = response.data.sort((a, b) => {
+          // If "returned_on" is null for a record, it should come first
+          if (!a.returned_on && b.returned_on) return -1;
+          if (a.returned_on && !b.returned_on) return 1;
+          return 0;  // If both have the same return status (either both null or both not null)
+        });
+
+        setBorrows(sortedHistory);  // Save users data to users state we defined above
         console.log(response.data);
         setLoading(false);         // Stop loading
       } catch (error) {
@@ -77,7 +85,7 @@ function UsersTable() {
             </TableHead>
             <TableBody>
               {borrows.map((record) => (
-                <TableRow key={record.id}>
+                <TableRow key={record.id} sx={{backgroundColor: (record.returned_on === null ? 'rgba(255, 0, 0, 0.1)' : 'transparent')}}>
                   <TableCell>{record.book_id}</TableCell>
                   <TableCell>{record.user_id}</TableCell>
                   <TableCell>{record.borrowed_on}</TableCell>
