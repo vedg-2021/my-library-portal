@@ -359,10 +359,46 @@ export default function AllBooks() {
                                 >
                                     {book.author}
                                 </Typography>
+                                <Box sx={{ flexGrow: 1 }} />
 
-                                {(localStorage.getItem('librarian') || localStorage.getItem('admin')) ? `current: ${book.current_quantity}` :
+                                {(localStorage.getItem('librarian') || localStorage.getItem('admin')) ?
+                                    <Box
+                                        sx={{
+                                            minHeight: '24px', // Fixes height so it doesn't move
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            backgroundColor: '#f5f5f5',
+                                            color: '#333',
+                                            padding: '4px 8px',
+                                            borderRadius: '4px',
+                                            fontSize: '0.8rem',
+                                            fontWeight: 'bold',
+                                            width: '100%', // Ensures it takes full width inside the card
+                                            textAlign: 'center',
+                                        }}
+                                    >
+                                        current: {book.current_quantity}
+                                    </Box> :
                                     null
                                 }
+
+                                {/* {(localStorage.getItem('librarian') || localStorage.getItem('admin')) && (
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 8,
+                                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                                            color: 'white',
+                                            padding: '4px 8px',
+                                            borderRadius: '4px',
+                                            fontSize: '0.8rem',
+                                        }}
+                                    >
+                                        current: {book.current_quantity}
+                                    </Box>
+                                )} */}
 
 
                                 {/* Row 4: Buttons */}
@@ -594,6 +630,7 @@ export default function AllBooks() {
                     {error || success}
                 </Alert>
             </Snackbar>
+
         </>
     );
 }

@@ -19,7 +19,7 @@ class BorrowsController < ApplicationController
 
     def index
         @borrows = Borrow.all
-        render json: @borrows
+        render json: @borrows, include: [:book, :user], status: :ok
     end
 
     def show

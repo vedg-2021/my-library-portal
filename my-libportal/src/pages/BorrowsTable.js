@@ -78,7 +78,9 @@ function UsersTable() {
             <TableHead>
               <TableRow>
                 <TableCell>Book Id</TableCell>
-                <TableCell>User Id</TableCell>
+                <TableCell>Book Name</TableCell>
+                <TableCell>Borrower Id</TableCell>
+                <TableCell>Borrower Name</TableCell>
                 <TableCell>Borrowed On</TableCell>
                 <TableCell>Returned On</TableCell>
               </TableRow>
@@ -87,7 +89,9 @@ function UsersTable() {
               {borrows.map((record) => (
                 <TableRow key={record.id} sx={{backgroundColor: (record.returned_on === null ? 'rgba(255, 0, 0, 0.1)' : 'transparent')}}>
                   <TableCell>{record.book_id}</TableCell>
+                  <TableCell>{record.book.title}</TableCell>
                   <TableCell>{record.user_id}</TableCell>
+                  <TableCell>{record.user.name}</TableCell>
                   <TableCell>{record.borrowed_on}</TableCell>
                   <TableCell>{record.returned_on === null ? "Not Returned" : record.returned_on}</TableCell>
                 </TableRow>
