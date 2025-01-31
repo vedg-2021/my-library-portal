@@ -12,7 +12,13 @@ class SessionsController < ApplicationController
                     render json: {message: 'Your profile was deleted.'}, status: :forbidden
                 elsif @user.authenticate(user_params[:password])
                     secret_key = Rails.application.credentials.secret_key_base
-                    token = JWT.encode({user_id: @user.id, exp: 24.hours.from_now.to_i}, secret_key, 'HS256')
+                    payload = {
+                        user_id: @user.id,
+                        name: @user.name,
+                        email: @user.email,
+                        exp: 24.hours.from_now.to_i # Token expiration time
+                    }
+                    token = JWT.encode(payload, secret_key, 'HS256')
                     render json: { message: 'Login successful', token: token, user: @user }, status: :ok
                 else
                     render json: {message: 'Invalid email or password'}, status: :unauthorized

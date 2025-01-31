@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom'; // To access URL params
+import { useNavigate, useParams } from 'react-router-dom'; // To access URL params
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Alert } from '@mui/material';
 
 function BorrowingHistory() {
@@ -8,6 +8,24 @@ function BorrowingHistory() {
   const [borrowingHistory, setBorrowingHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    // console.log("hello", localStorage.getItem('user'));
+    const userRole = localStorage.getItem('librarian') || localStorage.getItem('admin');
+
+    if(!userRole){
+      if (localStorage.getItem('user')){
+        if(JSON.parse(localStorage.getItem('user')).id === userId)
+        return;
+      } else{
+        navigate('/');
+      }
+
+    }
+  }, []);
+
 
   // Fetch user's borrowing history when the component mounts
   useEffect(() => {
@@ -15,6 +33,7 @@ function BorrowingHistory() {
       try {
         const response = await axios.get(`http://localhost:3000/borrowing_history/user/${userId}`);
         console.log("API Response:", response);
+        setUserName(response.data[0].user.name);
         // Sort the borrowing history so that books that have not been returned come first
         const sortedHistory = response.data.sort((a, b) => {
             // If "returned_on" is null for a record, it should come first
@@ -41,7 +60,7 @@ function BorrowingHistory() {
   return (
     <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Borrowing History for User ID: {userId}
+        Borrowing History for User: {userName}
       </Typography>
 
       {/* Display error message */}

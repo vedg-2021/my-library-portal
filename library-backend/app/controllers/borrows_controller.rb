@@ -38,9 +38,6 @@ class BorrowsController < ApplicationController
         
         if @user
             # Fetch borrowing history for the specific user
-            # @borrows = Borrow.where.not(borrowed_on: nil).where.(user_id: @user.id).includes(:book) # Assuming each borrow is associated with a book
-
-            # Fetch old records where borrowed_on and returned_on are set, and approvals are true
             old_records = Borrow.where(
                 user_id: @user.id,
                 request_is_approved: true,
@@ -64,7 +61,7 @@ class BorrowsController < ApplicationController
             
             # Check if there are any borrow records
             if @borrows.exists?
-                render json: @borrows, include: :book # Include book details if available
+                render json: @borrows, include: [:book, :user] # Include book details if available
             else
                 render json: { message: "No borrowing history available" }, status: :not_found
             end
