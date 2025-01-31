@@ -13,7 +13,7 @@
 //   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
 
 
-  
+
 //   // Initialize state directly from localStorage (will get updated after login/logout)
 //   const getUsername = () => {
 //     const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
@@ -21,7 +21,7 @@
 //     const admin = localStorage.getItem('admin') ? JSON.parse(localStorage.getItem('admin')) : null;
 //     return user?.name || librarian?.name || admin?.name || 'Guest';
 //   };
-  
+
 //   const [username, setUsername] = useState(getUsername);  // Set initial username
 //   useEffect(() => {
 //     const interval = setInterval(() => {
@@ -228,10 +228,20 @@ function NavBar() {
             LIBRARY PORTAL
           </Typography>
 
+        {/* Right side: Username & Menu Icon */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          {isAuthenticated && (
+            <Typography sx={{ fontWeight: 'bold' }}>
+              {username}
+            </Typography>
+          )}
+
           {/* Menu icon to open the drawer */}
           <IconButton color="inherit" onClick={handleDrawerToggle}>
             <MenuIcon />
           </IconButton>
+          </Box>
+          
 
           {/* Left-side Drawer */}
           <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>

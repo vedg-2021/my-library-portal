@@ -65,3 +65,9 @@ class BorrowsController < ApplicationController
         params.require(:borrow).permit(:book_id, :user_id, :borrowed_on, :returned_on)
     end
 end
+
+
+
+
+
+

@@ -25,16 +25,32 @@ class BooksController < ApplicationController
   
   def update
     @book = Book.find_by(id: params[:id])
+  
     if @book
-      if @book.update(book_params)
-        render json: { message: "Book updated successfully", book: @book }, status: :ok
+      out = @book.total_quantity - @book.current_quantity  # Calculate borrowed books
+  
+      if params[:total_quantity].to_i < out
+        render json: { message: "Total quantity cannot be less than borrowed books (#{out})" }, status: :unprocessable_entity
       else
-        render json: { errors: @book.errors.full_messages }, status: :unprocessable_entity
+        if params[:total_quantity].to_i > @book.total_quantity
+          # Increase stock, adjust `current_quantity` accordingly
+          new_current_quantity = @book.current_quantity + (params[:total_quantity].to_i - @book.total_quantity)
+        else
+          # Reduce stock, ensuring `current_quantity` never goes below borrowed books
+          new_current_quantity = params[:total_quantity].to_i - out
+        end
+  
+        if @book.update(book_params.merge(current_quantity: new_current_quantity))
+          render json: { message: "Book updated successfully", book: @book }, status: :ok
+        else
+          render json: { errors: @book.errors.full_messages }, status: :unprocessable_entity
+        end
       end
     else
       render json: { error: "Book not found" }, status: :not_found
     end
   end
+  
 
   def destroy
       @book = Book.find_by(id: params[:id])
