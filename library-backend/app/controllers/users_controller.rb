@@ -4,15 +4,12 @@ class UsersController < ApplicationController
       @user = User.new(user_params)
   
       if @user.save # @user.save tries to save what data we've to 
-        # Send a response back with the user data (excluding the password)
         render json: { message: 'Sign Up Successfull. You are being redirected to Login page.', user: @user }, status: :created
       else
-        # Return validation errors if user creation fails
         render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
       end
     end
 
-    # GET /users
     def index
         @users = User.where(is_approved: true, is_deleted: false)
         render json: @users
@@ -23,11 +20,9 @@ class UsersController < ApplicationController
       @user = User.find_by(id: params[:id])
 
       if @user
-        # Check if the user has any borrow records where 'returned_on' is null
         if @user.borrows.where(returned_on: nil).exists?
           render json: { error: "User has borrowed books that haven't been returned and cannot be deleted" }, status: :unprocessable_entity
         else
-          # Proceed with deletion if no borrow records with 'returned_on' is null
           @user.update(is_deleted: true)
           render json: { message: "User deleted successfully", user: @user}, status: :ok
         end
@@ -40,7 +35,6 @@ class UsersController < ApplicationController
       @user = User.find_by(id: params[:id])
     
       if @user
-        # Check if the new email is already taken by another user
         if user_params[:email].present? && User.exists?(email: user_params[:email]) && user_params[:email] != @user.email
           render json: { error: "Email is already taken by another user." }, status: :unprocessable_entity
         else

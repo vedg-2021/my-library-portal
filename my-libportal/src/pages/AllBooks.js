@@ -211,8 +211,14 @@ export default function AllBooks() {
             // Remove the deleted book from the UI state
             setBooks((prevBooks) => prevBooks.filter(book => book.id !== bookId));
             setFilteredBooks(prevBooks => prevBooks.filter(book => book.id !== bookId)); // Also update the filtered books state
+            setError('');
+            setSuccess('Book Deleted Successfully!');
+            setOpenSnackbar(true);
         } catch (error) {
-            setError('Error deleting the book');
+            setSuccess('');
+            // console.log(error);
+            setError(error.response.data.error);
+            setOpenSnackbar(true);
         }
     };
 

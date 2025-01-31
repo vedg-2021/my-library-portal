@@ -1,8 +1,9 @@
 class BooksController < ApplicationController
     def index
-        @books = Book.all
+        @books = Book.where(is_deleted: false)
         render json: @books
     end
+
     def create
         @book = Book.new(book_params)
         if @book.save
@@ -53,14 +54,23 @@ class BooksController < ApplicationController
   
 
   def destroy
-      @book = Book.find_by(id: params[:id])
-      if @book
-          @book.destroy
-          render json: { message: "Book deleted successfully" }, status: :ok
-      else
-          render json: { error: "Book not found" }, status: :not_found
-      end
+    @book = Book.find_by(id: params[:id])
+  
+    if @book.nil?
+      return render json: { error: "Book not found" }, status: :not_found
+    end
+  
+    if Borrow.where(book_id: @book.id, returned_on: nil).exists?
+      return render json: { error: "Book cannot be deleted. It is currently borrowed!" }, status: :forbidden
+    end
+  
+    if @book.update(is_deleted: true)
+      render json: { message: "Book deleted successfully!" }, status: :ok
+    else
+      render json: { error: "Failed to delete book" }, status: :unprocessable_entity
+    end
   end
+  
 
 
     def book_params
