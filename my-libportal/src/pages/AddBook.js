@@ -201,6 +201,8 @@ function AddBook() {
                 <MenuItem value="Mystery">Mystery</MenuItem>
                 <MenuItem value="Dystopian">Dystopian</MenuItem>
                 <MenuItem value="Romance">Romance</MenuItem>
+                <MenuItem value="Adventure">Adventure</MenuItem>
+                <MenuItem value="Classic">Classic</MenuItem>
               </Select>
               <FormHelperText>Choose a genre</FormHelperText>
             </FormControl>

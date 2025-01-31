@@ -266,7 +266,7 @@ export default function AllBooks() {
                         {/* Search icon button */}
                         <IconButton
                             onClick={handleSearch}
-                            sx={{ backgroundColor: '#6404eb', color: 'white', '&:hover': { backgroundColor: '#1565c0' } }}
+                            sx={{ backgroundColor: '#6404eb', color: 'white', '&:hover': { backgroundColor: '#4c159b' } }}
                         >
                             <SearchIcon />
                         </IconButton>
@@ -360,7 +360,7 @@ export default function AllBooks() {
                                     {book.author}
                                 </Typography>
 
-                                {localStorage.getItem('librarian') ? `current: ${book.current_quantity}` :
+                                {(localStorage.getItem('librarian') || localStorage.getItem('admin')) ? `current: ${book.current_quantity}` :
                                     null
                                 }
 
@@ -518,7 +518,7 @@ export default function AllBooks() {
                             color="primary"
                             sx={{
                                 '& .MuiPaginationItem-root': { color: 'black' }, // Change page number color
-                                '& .Mui-selected': { backgroundColor: '#6404eb', color: 'white' }, // Selected page styling
+                                '& .Mui-selected': { backgroundColor: '#6404eb !important', color: 'white' }, // Selected page styling
                                 '& .MuiPaginationItem-root:hover': { backgroundColor: '#ddd' } // Hover effect                    
                             }}
                         />
