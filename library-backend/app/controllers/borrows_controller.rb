@@ -143,6 +143,18 @@ class BorrowsController < ApplicationController
         end
     end
 
+    def destroy
+        logger.debug "Params: #{params.inspect}"
+        @borrow = Borrow.find_by(id: params[:id])
+    
+        if @borrow.nil?
+            return render json: { error: "Borrow record not found" }, status: :not_found
+        else
+            @borrow.destroy
+            render json: { message: "Borrow record deleted successfully" }, status: :ok
+        end
+    end
+
     private
 
     

@@ -35,6 +35,7 @@ Rails.application.routes.draw do
   put '/approve_borrow', to: 'borrows#approveborrow'
   put '/approve_return', to: 'borrows#approvereturn'
   post '/borrow_book', to: 'borrows#borrow'
+  delete '/rejectborrow/:id', to: 'borrows#destroy'
 
   
   post '/add_admin', to: 'admins#create'

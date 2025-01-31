@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom'; // To access URL params
+import { useNavigate, useParams } from 'react-router-dom'; // To access URL params
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Alert, Button, Link, Snackbar } from '@mui/material';
 
 function BorrowingHistory() {
@@ -8,8 +8,29 @@ function BorrowingHistory() {
     const [pendingRequests, setPendingRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const navigate = useNavigate();
     const [success, setSuccess] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [open, setOpen] = useState(true);
+
+
+
+      useEffect(() => {
+    
+        // Check if the user is a librarian or admin; if not, redirect to home
+        const userRole = localStorage.getItem('librarian') || localStorage.getItem('admin');
+        if (!userRole) {
+          navigate('/'); // Redirect to home or another page
+        }
+    
+        if (success) {
+          const timer = setTimeout(() => {
+            setOpen(false);
+          }, 5000); // Success dissapears after 5 seconds
+    
+          return () => clearTimeout(timer); // Cleanup on unmount
+        }
+      }, [success]);
 
     // Fetch user's borrowing history when the component mounts
     useEffect(() => {
@@ -47,10 +68,30 @@ function BorrowingHistory() {
             console.log(response.data.message);
             // After approval, remove the record from the list
             setPendingRequests((prevRequests) => prevRequests.filter(request => request.id !== recordId));
+            setError('');
             setSuccess('Borrow Approved!');
             setOpenSnackbar(true);
         } catch (error) {
+            setSuccess('');
             console.log(error.response.data.message);
+            setError(error.response.data.message);
+            setOpenSnackbar(true);
+        }
+    };
+
+    const handleDelete = async (recordId) => {
+        try{
+            console.log(recordId);
+            const response = await axios.delete(`http://localhost:3000/rejectborrow/${recordId}`)
+            setPendingRequests((prevRequests) => prevRequests.filter(request => request.id !== recordId));
+            setError('');
+            setSuccess(response.data.message);
+            setOpenSnackbar(true);
+        } catch(error){
+            console.log('Error happened while rejecting request');
+            setSuccess('');
+            setError(error.response.data.error);
+            setOpenSnackbar(true);
         }
     };
 
@@ -60,13 +101,6 @@ function BorrowingHistory() {
                 <Typography variant="h4" gutterBottom>
                     Pending Approvals
                 </Typography>
-
-                {/* Display error message */}
-                {error && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
-                        {error}
-                    </Alert>
-                )}
 
                 {/* Show loading spinner while fetching data */}
                 {loading ? (
@@ -114,7 +148,7 @@ function BorrowingHistory() {
                                                 <Button
                                                     variant="outlined"
                                                     color="secondary"
-                                                // onClick={() => handleDelete(user.id)} // Trigger delete function
+                                                    onClick={() => handleDelete(record.id)} // Trigger delete function
                                                 >
                                                     Reject
                                                 </Button>

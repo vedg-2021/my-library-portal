@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom'; // To access URL params
+import { useNavigate, useParams } from 'react-router-dom'; // To access URL params
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Alert, Button, Link, Snackbar } from '@mui/material';
 
 function BorrowingHistory() {
@@ -10,6 +10,26 @@ function BorrowingHistory() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [open, setOpen] = useState(true);
+    const navigate = useNavigate(); // Use history hook for navigation
+
+
+    useEffect(() => {
+
+    // Check if the user is a librarian or admin; if not, redirect to home
+    const userRole = localStorage.getItem('librarian') || localStorage.getItem('admin');
+    if (!userRole) {
+        navigate('/'); // Redirect to home or another page
+    }
+
+    if (success) {
+        const timer = setTimeout(() => {
+        setOpen(false);
+        }, 5000); // Success dissapears after 5 seconds
+
+        return () => clearTimeout(timer); // Cleanup on unmount
+    }
+    }, [success]);
 
     // Fetch user's borrowing history when the component mounts
     useEffect(() => {
@@ -60,13 +80,6 @@ function BorrowingHistory() {
                     Pending Returns
                 </Typography>
 
-                {/* Display error message */}
-                {error && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
-                        {error}
-                    </Alert>
-                )}
-
                 {/* Show loading spinner while fetching data */}
                 {loading ? (
                     <CircularProgress sx={{ display: 'block', margin: 'auto' }} />
@@ -109,13 +122,6 @@ function BorrowingHistory() {
                                                     sx={{ mr: 1 }}
                                                 >
                                                     Approve
-                                                </Button>
-                                                <Button
-                                                    variant="outlined"
-                                                    color="secondary"
-                                                // onClick={() => handleDelete(user.id)} // Trigger delete function
-                                                >
-                                                    Reject
                                                 </Button>
                                             </TableCell>
                                         </TableRow>

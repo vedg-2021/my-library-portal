@@ -12,12 +12,12 @@ function AddBook() {
   const [availability_status, setAvailability] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [open, setOpen] = useState(true);
-  const navigate = useNavigate(); // Use history hook for navigation
   const [quantity, setQuantity] = useState();
   const [isbn, setIsbn] = useState('');
   const [price, setPrice] = useState();
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [open, setOpen] = useState(true);
+  const navigate = useNavigate(); // Use history hook for navigation
 
 
   useEffect(() => {
